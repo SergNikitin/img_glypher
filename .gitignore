@@ -19,3 +19,12 @@
 *.exe
 *.out
 *.app
+
+*.sublime-workspace
+
+# CMake leftovers
+*.cmake
+CMakeCache.txt
+CMakeFiles
+product
+Makefile

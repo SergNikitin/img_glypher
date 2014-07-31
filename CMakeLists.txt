@@ -88,7 +88,9 @@ add_dependencies(img_glypher    freetype_ext_project
                                 sdl2_ext_project
                                 sdl2_image_ext_project)
 
-target_link_libraries(img_glypher   ${FREETYPE_BIN}/libfreetype.a
-                                    ${SDL2_BIN}/libSDL2.a
+target_link_libraries(img_glypher   ${SDL2_BIN}/libSDL2.a
                                     ${SDL2_IMAGE_BIN}/.libs/libSDL2_image.a
-                                    )
+                                    pthread
+                                    m
+                                    dl)
+
