@@ -3,8 +3,6 @@
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
-#include "SDL_image.h"
-
 static void printByte(unsigned char byte) {
     for (int bit = 7; bit >= 0; --bit) {
         std::cout << (byte & (unsigned char)(1 << bit) ? '*' : ' ');

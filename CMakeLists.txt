@@ -71,7 +71,8 @@ ExternalProject_Get_Property(sdl2_image_ext_project BINARY_DIR)
 set(SDL2_IMAGE_SRC ${SOURCE_DIR})
 set(SDL2_IMAGE_BIN ${BINARY_DIR})
 
-
+# Tests
+add_subdirectory(tests)
 
 # Main application
 include_directories(${FREETYPE_SRC}/include)
@@ -86,11 +87,13 @@ file(GLOB SRC_FILES
 add_executable(img_glypher ${SRC_FILES})
 add_dependencies(img_glypher    freetype_ext_project
                                 sdl2_ext_project
-                                sdl2_image_ext_project)
+                                sdl2_image_ext_project
+                                freetype_test
+                                sdl2_image_test)
 
-target_link_libraries(img_glypher   ${SDL2_BIN}/libSDL2.a
+target_link_libraries(img_glypher   ${FREETYPE_BIN}/libfreetype.a
+                                    ${SDL2_BIN}/libSDL2.a
                                     ${SDL2_IMAGE_BIN}/.libs/libSDL2_image.a
                                     pthread
                                     m
                                     dl)
-
