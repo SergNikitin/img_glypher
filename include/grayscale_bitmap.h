@@ -14,10 +14,10 @@ typedef std::unique_ptr<std::vector<unsigned char>> unique_pixels_ptr;
 
 class GrayscaleBitmap {
 public:
-    explicit GrayscaleBitmap(FT_Bitmap&);
+    explicit GrayscaleBitmap(const FT_Bitmap&);
     explicit GrayscaleBitmap(SDL_Surface&);
 
-    GrayscaleBitmap(GrayscaleBitmap&);
+    GrayscaleBitmap(const GrayscaleBitmap&);
 
     virtual ~GrayscaleBitmap();
 
