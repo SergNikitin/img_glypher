@@ -3,7 +3,8 @@
 
 #include "grayscale_bitmap.h"
 
-GrayscaleBitmap getBitmapForAsciiSymbol(uint8_t symbolCode);
-void setFontFile(std::string filepath);
+void initGlyphExtractionModule();
+void setFontFile(std::string newFilePath);
+GrayscaleBitmap getBitmapForAsciiSymbol(char symbol);
 
 #endif
