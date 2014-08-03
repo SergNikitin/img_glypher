@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "grayscale_bitmap.h"
-#include "glyph_extractor.h"
+#include "freetype_interface.h"
 
 int main() {
     return 0;

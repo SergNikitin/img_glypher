@@ -4,7 +4,7 @@
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
-#include "glyph_extractor.h"
+#include "freetype_interface.h"
 #include "grayscale_bitmap.h"
 
 class FreetypeMaintainer {

@@ -1,5 +1,5 @@
-#ifndef __GLYPH_EXTRACTOR_H__
-#define __GLYPH_EXTRACTOR_H__
+#ifndef __FREETYPE_INTERFACE_H__
+#define __FREETYPE_INTERFACE_H__
 
 #include "grayscale_bitmap.h"
 
