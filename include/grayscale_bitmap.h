@@ -10,7 +10,8 @@
 
 #include "SDL.h"
 
-typedef std::unique_ptr<std::vector<unsigned char>> unique_pixels_ptr;
+typedef unsigned char gray_pixel;
+typedef std::unique_ptr<std::vector<gray_pixel>> unique_pixels_ptr;
 
 class GrayscaleBitmap {
 public:
@@ -28,6 +29,39 @@ public:
 
 private:
     GrayscaleBitmap();
+};
+
+class FramedBitmap;
+class FrameSlider;
+
+class FramedBitmap : public GrayscaleBitmap {
+public:
+    FrameSlider firstFrame(const int16_t width, const int16_t height);
+    FrameSlider lastFrame( const int16_t width, const int16_t height);
+};
+
+class FrameSlider {
+public:
+    FrameSlider(const FramedBitmap& _map,
+                const int16_t _width, const int16_t _height,
+                int16_t _leftBorderCol = 0, int16_t _topBorderRow = 0);
+
+    virtual ~FrameSlider();
+
+    void slide();
+    gray_pixel at(int16_t pos) const;
+
+    bool operator==(const FrameSlider&) const;
+    bool operator!=(const FrameSlider&) const;
+
+private:
+    const FramedBitmap* map;
+    const int16_t width;
+    const int16_t height;
+    int16_t leftBorderCol;
+    int16_t topBorderRow;
+
+    FrameSlider();
 };
 
 #endif
