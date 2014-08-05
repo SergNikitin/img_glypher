@@ -8,7 +8,9 @@ public:
     SdlMaintainer() : surface(nullptr){};
 
     virtual ~SdlMaintainer() {
-        SDL_FreeSurface(surface);
+        if (surface != nullptr) {
+            SDL_FreeSurface(surface);
+        }
     }
 
     SDL_Surface* surface;
