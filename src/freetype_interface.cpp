@@ -9,10 +9,7 @@
 
 class FreetypeMaintainer {
 public:
-    FreetypeMaintainer() {
-        library = nullptr;
-        fontFace = nullptr;
-
+    FreetypeMaintainer() : library(nullptr), fontFace(nullptr) {
         int error = FT_Init_FreeType(&library);
         if (error) {
             throw std::runtime_error("Unable to initalize Freetype library");
