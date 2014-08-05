@@ -24,14 +24,14 @@ static inline uint8_t convert24BitRgbPixelToGrayscale(const uint8_t* rgbPixel) {
 }
 
 static const uint8_t MAX_GRAY_LEVELS = 255;
-GrayscaleBitmap::GrayscaleBitmap(SDL_Surface& _surface)
-    : rows(_surface.h), columns(_surface.w)
-    , pixels(new pixels_vector(_surface.h * _surface.w, 0))
+GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
+    : rows(surface->h), columns(surface->w)
+    , pixels(new pixels_vector(surface->h * surface->w, 0))
     , num_grays(MAX_GRAY_LEVELS) {
 
     static const uint32_t UNUSED_FLAGS = 0;
-    SDL_Surface* surfaceCopy = SDL_ConvertSurface(&_surface, _surface.format,
-                                                            _surface.flags);
+    SDL_Surface* surfaceCopy = SDL_ConvertSurface(surface,  surface->format,
+                                                            surface->flags);
     surfaceCopy = SDL_ConvertSurfaceFormat( surfaceCopy,
                                             SDL_PIXELFORMAT_RGB888,
                                             UNUSED_FLAGS);
@@ -57,6 +57,9 @@ GrayscaleBitmap::GrayscaleBitmap(const GrayscaleBitmap& toCopy)
 
 GrayscaleBitmap::~GrayscaleBitmap() {}
 
+
+FramedBitmap::FramedBitmap(SDL_Surface* surface) : GrayscaleBitmap(surface) {}
+FramedBitmap::FramedBitmap(const FramedBitmap& map) : GrayscaleBitmap(map) {}
 
 FrameSlider FramedBitmap::firstFrame(const int16_t width, const int16_t height) {
     return FrameSlider(*this, width, height);
