@@ -12,6 +12,12 @@ public:
         if (error) {
             throw std::runtime_error(SDL_GetError());
         }
+
+        error = IMG_Init(0);
+        if (error) {
+            throw std::runtime_error(IMG_GetError());
+        }
+
     };
 
     virtual ~SdlMaintainer() {
