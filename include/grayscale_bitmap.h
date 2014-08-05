@@ -70,4 +70,4 @@ private:
     FrameSlider();
 };
 
-#endif
+#endif // __GRAYSCALE_BITMAP_H__

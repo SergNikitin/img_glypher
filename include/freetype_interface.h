@@ -6,4 +6,4 @@
 void setFontFile(const std::string& newFilePath);
 GrayscaleBitmap getBitmapForAsciiSymbol(char symbol);
 
-#endif
+#endif // __FREETYPE_INTERFACE_H__
