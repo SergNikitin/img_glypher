@@ -1,3 +1,5 @@
+#include <exception>
+
 #include "SDL.h"
 #include "SDL_image.h"
 
@@ -5,12 +7,20 @@
 
 class SdlMaintainer {
 public:
-    SdlMaintainer() : surface(nullptr){};
+    SdlMaintainer() : surface(nullptr) {
+        int error = SDL_Init(0);
+        if (error) {
+            throw std::runtime_error(SDL_GetError());
+        }
+    };
 
     virtual ~SdlMaintainer() {
         if (surface != nullptr) {
             SDL_FreeSurface(surface);
         }
+
+        IMG_Quit();
+        SDL_Quit();
     }
 
     SDL_Surface* surface;
