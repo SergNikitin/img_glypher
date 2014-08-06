@@ -52,8 +52,14 @@ void setFontFile(const std::string& newFilePath) {
         throw std::runtime_error(err.str());
     }
 
-    error = FT_Set_Char_Size(maintainer.fontFace,   SAME_AS_NEXT_ARG, 16*64,
-                                                    SAME_AS_NEXT_ARG, 300);
+    if (!FT_IS_FIXED_WIDTH(maintainer.fontFace)) {
+        throw std::runtime_error("Loaded font face must be monospaced");
+    }
+
+    // error = FT_Set_Char_Size(maintainer.fontFace,   SAME_AS_NEXT_ARG, 16*64,
+                                                    // SAME_AS_NEXT_ARG, 300);
+
+    error = FT_Set_Pixel_Sizes(maintainer.fontFace, 9, 16);
     if (error) {
         throw std::runtime_error("Error while setting char size");
     }
