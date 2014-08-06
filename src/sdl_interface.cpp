@@ -5,19 +5,21 @@
 
 #include "sdl_interface.h"
 
+#define NO_EXTRA_SUBMODULES 0
+
 class SdlMaintainer {
 public:
     SdlMaintainer() : surface(nullptr) {
-        int error = SDL_Init(0);
+        int error = SDL_Init(NO_EXTRA_SUBMODULES);
         if (error) {
             throw std::runtime_error(SDL_GetError());
         }
 
-        error = IMG_Init(0);
+        error = IMG_Init(NO_EXTRA_SUBMODULES);
         if (error) {
+            SDL_Quit();
             throw std::runtime_error(IMG_GetError());
         }
-
     };
 
     virtual ~SdlMaintainer() {
