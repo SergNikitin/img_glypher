@@ -38,7 +38,7 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
 
     static const uint8_t RGB_PIXEL_SIZE = 3;
     for (int16_t thisRow = 0; thisRow < rows; ++thisRow) {
-        for (int16_t thisColumn = 0; thisColumn < columns; ++columns) {
+        for (int16_t thisColumn = 0; thisColumn < columns; ++thisColumn) {
             uint8_t* rgbPixel = (uint8_t*)surfaceCopy->pixels
                                         + thisRow * rows
                                         + thisColumn * RGB_PIXEL_SIZE;
@@ -76,7 +76,7 @@ FrameSlider FramedBitmap::lastFrame(const int16_t width, const int16_t height) {
 FrameSlider::FrameSlider(const FramedBitmap& _map,
                         const int16_t _width, const int16_t _height,
                         int16_t _leftBorderCol, int16_t _topBorderRow)
-    : map(&_map), width(_width), height(_height)
+    : newline(false), map(&_map), width(_width), height(_height)
     , leftBorderCol(_leftBorderCol), topBorderRow(_topBorderRow) {
 
     if (    width >= map->columns
@@ -96,10 +96,12 @@ void FrameSlider::slide() {
     int16_t frameBelowRowPos = topBorderRow + height;
 
     if (frameToRightColPos + width < map->columns) {
+        newline = false;
         newLeftBorder = frameToRightColPos;
         newTopBorder = topBorderRow;
     }
     else if (frameBelowRowPos + height < map->rows) {
+        newline = true;
         newLeftBorder = 0;
         newTopBorder = frameBelowRowPos;
     }
@@ -111,7 +113,7 @@ void FrameSlider::slide() {
     topBorderRow = newTopBorder;
 }
 
-gray_pixel FrameSlider::at(int16_t pos) const {
+gray_pixel FrameSlider::at(int32_t pos) const {
     if (pos >= width * height) {
         throw std::out_of_range("Out of frame borders");
     }

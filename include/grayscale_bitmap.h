@@ -22,10 +22,10 @@ public:
 
     virtual ~GrayscaleBitmap();
 
-    int16_t rows;
-    int16_t columns;
+    const int16_t rows;
+    const int16_t columns;
     const unique_pixels_ptr pixels;
-    uint8_t num_grays;
+    const uint8_t num_grays;
 
 private:
     GrayscaleBitmap();
@@ -36,8 +36,8 @@ class FrameSlider;
 
 class FramedBitmap : public GrayscaleBitmap {
 public:
-    FramedBitmap(SDL_Surface*);
     FramedBitmap(const FramedBitmap&);
+    FramedBitmap(SDL_Surface*);
 
     FrameSlider firstFrame(const int16_t width, const int16_t height);
     FrameSlider lastFrame( const int16_t width, const int16_t height);
@@ -55,10 +55,12 @@ public:
     virtual ~FrameSlider();
 
     void slide();
-    gray_pixel at(int16_t pos) const;
+    gray_pixel at(int32_t pos) const;
 
     bool operator==(const FrameSlider&) const;
     bool operator!=(const FrameSlider&) const;
+
+    bool newline;
 
 private:
     const FramedBitmap* map;
@@ -66,6 +68,7 @@ private:
     const int16_t height;
     int16_t leftBorderCol;
     int16_t topBorderRow;
+
 
     FrameSlider();
 };
