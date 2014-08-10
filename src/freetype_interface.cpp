@@ -70,7 +70,7 @@ GrayscaleBitmap getBitmapForAsciiSymbol(char symbol) {
                                 FT_LOAD_RENDER);
 
     if (error) {
-        throw std::runtime_error("error while loading char");
+        throw std::runtime_error("Error while loading char");
     }
 
     return GrayscaleBitmap(maintainer.fontFace->glyph->bitmap);

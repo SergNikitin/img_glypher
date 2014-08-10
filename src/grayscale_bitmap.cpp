@@ -17,9 +17,11 @@ static inline uint8_t convert24BitRgbPixelToGrayscale(const uint8_t* rgbPixel) {
     uint8_t r = *(rgbPixel + 0);
     uint8_t g = *(rgbPixel + 1);
     uint8_t b = *(rgbPixel + 2);
+
     uint8_t grayLevel =   0.212671f * r
                         + 0.715160f * g
                         + 0.072169f * b;
+
     return grayLevel;
 }
 
@@ -42,10 +44,11 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
             uint8_t* rgbPixel = (uint8_t*)surfaceCopy->pixels
                                         + thisRow * rows
                                         + thisColumn * RGB_PIXEL_SIZE;
-            (*pixels)[thisRow*rows + thisColumn]
-                = convert24BitRgbPixelToGrayscale(rgbPixel);
+            uint8_t grayLevel = convert24BitRgbPixelToGrayscale(rgbPixel);
+            pixels->push_back(grayLevel);
         }
     }
+
 
     SDL_FreeSurface(surfaceCopy);
 }
@@ -122,6 +125,10 @@ gray_pixel FrameSlider::at(int32_t pos) const {
     int16_t mapColumn = leftBorderCol + pos % width;
 
     return map->pixels->at(mapRow * map->columns + mapColumn);
+}
+
+int32_t FrameSlider::size() const {
+    return (int32_t)width * height;
 }
 
 bool FrameSlider::operator==(const FrameSlider& toCompare) const {

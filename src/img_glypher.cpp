@@ -1,14 +1,21 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <stdexcept>
 
 #include "grayscale_bitmap.h"
 #include "freetype_interface.h"
 #include "sdl_interface.h"
 
-int8_t calculateGrayLevelDiff(  const FrameSlider& imgPart,
+uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
                                 const GrayscaleBitmap& glyph) {
-    int32_t pixelCount = glyph.rows * glyph.columns;
+    if ((int32_t)glyph.rows * glyph.columns != imgPart.size()) {
+        std::cout << glyph.rows << 'x' << glyph.columns << " vs " << imgPart.size()
+                << std::endl;
+        throw std::runtime_error("Sizes of image part and symbol glyph do not match");
+    }
+
+    int32_t pixelCount = imgPart.size();
     int32_t diffAcc = 0;
 
     for (int32_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
@@ -19,15 +26,15 @@ int8_t calculateGrayLevelDiff(  const FrameSlider& imgPart,
 }
 
 char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    static const char LAST_ASCII_SYMBOL     = static_cast<char>(127);
-    static const char FIRST_ASCII_SYMBOL    = static_cast<char>(0);
+    static const char LAST_ASCII_SYMBOL     = static_cast<char>(126);
+    static const char FIRST_ASCII_SYMBOL    = static_cast<char>(33);
 
     uint8_t minGrayLevelDiff = 0xFF;
     char bestMatch = ' ';
 
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap map = getBitmapForAsciiSymbol(symbol);
-        int8_t thisSymbolDiff = calculateGrayLevelDiff(imgPart, map);
+        uint8_t thisSymbolDiff = calculateGrayLevelDiff(imgPart, map);
 
         if (thisSymbolDiff < minGrayLevelDiff) {
             bestMatch = symbol;
@@ -43,7 +50,6 @@ void imageToText(std::string image, std::string font) {
 
     setFontFile(font);
     FramedBitmap map = loadGrayscaleImage(image);
-
 
     FrameSlider lastFrame = map.lastFrame(9, 16);
     FrameSlider frame = map.firstFrame(9, 16);

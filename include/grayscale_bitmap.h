@@ -56,6 +56,7 @@ public:
 
     void slide();
     gray_pixel at(int32_t pos) const;
+    int32_t size() const;
 
     bool operator==(const FrameSlider&) const;
     bool operator!=(const FrameSlider&) const;
