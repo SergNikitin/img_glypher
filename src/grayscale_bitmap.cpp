@@ -1,15 +1,29 @@
-#include <stdexcept>
+#include <exception>
 #include "grayscale_bitmap.h"
 
 typedef std::vector<gray_pixel> pixels_vector;
 
-GrayscaleBitmap::GrayscaleBitmap(const FT_Bitmap& ftBitmap)
-    : rows(ftBitmap.rows), columns(ftBitmap.width)
-    , pixels(new pixels_vector(ftBitmap.buffer, ftBitmap.buffer + rows*columns))
-    , num_grays(ftBitmap.num_grays) {
+#define FIXED_POINT_26_6_COEFF 64
+GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
+    : rows(fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF)
+    , columns(fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF)
+    , pixels(new pixels_vector(rows*columns, 0))
+    , num_grays(fontFace->glyph->bitmap.num_grays) {
 
-    if (ftBitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
-        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
+    int16_t baselineRow         = fontFace->size->metrics.ascender
+                                    / FIXED_POINT_26_6_COEFF;
+    int16_t leftBearing         = fontFace->glyph->bitmap_left;
+    int16_t fromTopToSymbol     = baselineRow - fontFace->glyph->bitmap_top;
+    const FT_Bitmap* ftBitmap   = &fontFace->glyph->bitmap;
+
+    for (int16_t symbolRow = 0; symbolRow < ftBitmap->rows; ++symbolRow) {
+        for (int16_t symbolCol = 0; symbolCol < ftBitmap->width; ++symbolCol) {
+            int16_t bitmapRow = fromTopToSymbol + symbolRow;
+            int16_t bitmapCol = leftBearing + symbolCol;
+
+            pixels->at(bitmapRow*columns + bitmapCol)
+                = ftBitmap->buffer[symbolRow*ftBitmap->width + symbolCol];
+        }
     }
 }
 

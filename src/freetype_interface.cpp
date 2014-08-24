@@ -34,6 +34,9 @@ private:
 static FreetypeMaintainer maintainer;
 
 #define SAME_AS_NEXT_ARG 0
+#define HORIZ_RESOLUTION 72
+#define VERTICAL_RESOLUTION HORIZ_RESOLUTION
+#define FIXED_POINT_26_6_COEFF 64
 
 void setFontFile(const std::string& newFilePath) {
     int error = FT_New_Face(maintainer.library, newFilePath.c_str(),
@@ -56,13 +59,26 @@ void setFontFile(const std::string& newFilePath) {
         throw std::runtime_error("Loaded font face must be monospaced");
     }
 
-    // error = FT_Set_Char_Size(maintainer.fontFace,   SAME_AS_NEXT_ARG, 16*64,
-                                                    // SAME_AS_NEXT_ARG, 300);
+    if (!FT_IS_SCALABLE(maintainer.fontFace)) {
+        throw std::runtime_error("Loaded font face must be scaleble");
+    }
 
-    error = FT_Set_Pixel_Sizes(maintainer.fontFace, 9, 16);
+    error = FT_Set_Char_Size(maintainer.fontFace,   SAME_AS_NEXT_ARG,
+                                                    16 * FIXED_POINT_26_6_COEFF,
+                                                    HORIZ_RESOLUTION,
+                                                    VERTICAL_RESOLUTION);
+
     if (error) {
         throw std::runtime_error("Error while setting char size");
     }
+}
+
+uint16_t getFontHeight() {
+    return maintainer.fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF;
+}
+
+uint16_t getFontWidth() {
+    return maintainer.fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF;
 }
 
 GrayscaleBitmap getBitmapForAsciiSymbol(char symbol) {
@@ -73,5 +89,13 @@ GrayscaleBitmap getBitmapForAsciiSymbol(char symbol) {
         throw std::runtime_error("Error while loading char");
     }
 
-    return GrayscaleBitmap(maintainer.fontFace->glyph->bitmap);
+    if (maintainer.fontFace->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+        throw std::runtime_error("Freetype symbol glyph must have bitmap format");
+    }
+
+    if (maintainer.fontFace->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
+        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
+    }
+
+    return GrayscaleBitmap(maintainer.fontFace);
 }

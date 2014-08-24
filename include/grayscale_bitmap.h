@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 #include "ft2build.h"
-#include FT_IMAGE_H
+#include FT_FREETYPE_H
 
 #include "SDL.h"
 
@@ -15,7 +15,7 @@ typedef std::unique_ptr<std::vector<gray_pixel>> unique_pixels_ptr;
 
 class GrayscaleBitmap {
 public:
-    explicit GrayscaleBitmap(const FT_Bitmap&);
+    explicit GrayscaleBitmap(const FT_Face);
     explicit GrayscaleBitmap(SDL_Surface*);
 
     GrayscaleBitmap(const GrayscaleBitmap&);

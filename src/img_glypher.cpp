@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <stdexcept>
+#include <exception>
 
 #include "grayscale_bitmap.h"
 #include "freetype_interface.h"
@@ -26,11 +26,12 @@ uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
 }
 
 char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    static const char LAST_ASCII_SYMBOL     = static_cast<char>(126);
     static const char FIRST_ASCII_SYMBOL    = static_cast<char>(33);
+    static const char LAST_ASCII_SYMBOL     = static_cast<char>(126);
 
     uint8_t minGrayLevelDiff = 0xFF;
     char bestMatch = ' ';
+
 
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap map = getBitmapForAsciiSymbol(symbol);
@@ -51,8 +52,8 @@ void imageToText(std::string image, std::string font) {
     setFontFile(font);
     FramedBitmap map = loadGrayscaleImage(image);
 
-    FrameSlider lastFrame = map.lastFrame(9, 16);
-    FrameSlider frame = map.firstFrame(9, 16);
+    FrameSlider lastFrame   = map.lastFrame(getFontWidth(), getFontHeight());
+    FrameSlider frame       = map.firstFrame(getFontWidth(), getFontHeight());
 
     for (; frame != lastFrame; frame.slide()) {
         if (frame.newline) {
@@ -67,7 +68,6 @@ void imageToText(std::string image, std::string font) {
 }
 
 int main(int argc, char* argv[]) {
-
     if (argc != 3) {
         std::cerr << "incorrect number of arguements: " << argc << std::endl;
         return 1;

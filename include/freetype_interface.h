@@ -4,6 +4,8 @@
 #include "grayscale_bitmap.h"
 
 void setFontFile(const std::string& newFilePath);
+uint16_t getFontHeight();
+uint16_t getFontWidth();
 GrayscaleBitmap getBitmapForAsciiSymbol(char symbol);
 
 #endif // __FREETYPE_INTERFACE_H__
