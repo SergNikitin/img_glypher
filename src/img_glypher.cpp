@@ -10,8 +10,6 @@
 uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
                                 const GrayscaleBitmap& glyph) {
     if ((int32_t)glyph.rows * glyph.columns != imgPart.size()) {
-        std::cout << glyph.rows << 'x' << glyph.columns << " vs " << imgPart.size()
-                << std::endl;
         throw std::runtime_error("Sizes of image part and symbol glyph do not match");
     }
 
@@ -19,23 +17,22 @@ uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
     int32_t diffAcc = 0;
 
     for (int32_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
-        diffAcc += abs(imgPart.at(pixelNum) - glyph.pixels->at(pixelNum));
+        diffAcc += abs((int)imgPart.at(pixelNum) - glyph.pixels->at(pixelNum));
     }
 
     return diffAcc / pixelCount;
 }
 
 char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    static const char FIRST_ASCII_SYMBOL    = static_cast<char>(33);
+    static const char FIRST_ASCII_SYMBOL    = static_cast<char>(32);
     static const char LAST_ASCII_SYMBOL     = static_cast<char>(126);
 
     uint8_t minGrayLevelDiff = 0xFF;
     char bestMatch = ' ';
 
-
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
-        GrayscaleBitmap map = getBitmapForAsciiSymbol(symbol);
-        uint8_t thisSymbolDiff = calculateGrayLevelDiff(imgPart, map);
+        GrayscaleBitmap symbolGlyph = getBitmapForAsciiSymbol(symbol);
+        uint8_t thisSymbolDiff = calculateGrayLevelDiff(imgPart, symbolGlyph);
 
         if (thisSymbolDiff < minGrayLevelDiff) {
             bestMatch = symbol;
@@ -59,6 +56,7 @@ void imageToText(std::string image, std::string font) {
         if (frame.newline) {
             outfile << '\n';
         }
+
         outfile << chooseMatchingSymbol(frame);
     }
 

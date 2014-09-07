@@ -27,43 +27,45 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     }
 }
 
-static inline uint8_t convert24BitRgbPixelToGrayscale(const uint8_t* rgbPixel) {
-    uint8_t r = *(rgbPixel + 0);
-    uint8_t g = *(rgbPixel + 1);
-    uint8_t b = *(rgbPixel + 2);
+static const uint8_t MAX_GRAY_LEVELS = 255;
+static inline uint8_t rgbPixelToGrayscale(  uint32_t rgbPixel,
+                                            const SDL_PixelFormat* fmt) {
+    uint8_t r = ((rgbPixel & fmt->Rmask) >> fmt->Rshift) << fmt->Rloss;
+    uint8_t g = ((rgbPixel & fmt->Gmask) >> fmt->Gshift) << fmt->Gloss;
+    uint8_t b = ((rgbPixel & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss;
 
     uint8_t grayLevel =   0.212671f * r
                         + 0.715160f * g
                         + 0.072169f * b;
 
-    return grayLevel;
+    return MAX_GRAY_LEVELS - grayLevel;
 }
 
-static const uint8_t MAX_GRAY_LEVELS = 255;
 GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     : rows(surface->h), columns(surface->w)
     , pixels(new pixels_vector(surface->h * surface->w, 0))
     , num_grays(MAX_GRAY_LEVELS) {
 
     static const uint32_t UNUSED_FLAGS = 0;
-    SDL_Surface* surfaceCopy = SDL_ConvertSurface(surface,  surface->format,
-                                                            surface->flags);
-    surfaceCopy = SDL_ConvertSurfaceFormat( surfaceCopy,
-                                            SDL_PIXELFORMAT_RGB888,
-                                            UNUSED_FLAGS);
+    SDL_Surface* surfaceCopy = SDL_ConvertSurfaceFormat(surface,
+                                                        SDL_PIXELFORMAT_RGB888,
+                                                        UNUSED_FLAGS);
+    SDL_LockSurface(surfaceCopy);
 
-    static const uint8_t RGB_PIXEL_SIZE = 3;
+    const uint8_t bytesPerPixel = surfaceCopy->format->BytesPerPixel;
     for (int16_t thisRow = 0; thisRow < rows; ++thisRow) {
         for (int16_t thisColumn = 0; thisColumn < columns; ++thisColumn) {
-            uint8_t* rgbPixel = (uint8_t*)surfaceCopy->pixels
-                                        + thisRow * rows
-                                        + thisColumn * RGB_PIXEL_SIZE;
-            uint8_t grayLevel = convert24BitRgbPixelToGrayscale(rgbPixel);
-            pixels->push_back(grayLevel);
+            uint32_t pixelNum = thisRow * columns + thisColumn;
+            uint8_t* pixelDataStart = (uint8_t*)surfaceCopy->pixels
+                                                + pixelNum * bytesPerPixel;
+            uint32_t rgbPixel = *(uint32_t*)pixelDataStart;
+            uint8_t grayLevel = rgbPixelToGrayscale(rgbPixel,
+                                                    surfaceCopy->format);
+            pixels->at(pixelNum) = grayLevel;
         }
     }
 
-
+    SDL_UnlockSurface(surfaceCopy);
     SDL_FreeSurface(surfaceCopy);
 }
 
