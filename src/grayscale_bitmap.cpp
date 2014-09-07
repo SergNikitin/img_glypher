@@ -50,6 +50,7 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     SDL_Surface* surfaceCopy = SDL_ConvertSurfaceFormat(surface,
                                                         SDL_PIXELFORMAT_RGB888,
                                                         UNUSED_FLAGS);
+
     SDL_LockSurface(surfaceCopy);
 
     const uint8_t bytesPerPixel = surfaceCopy->format->BytesPerPixel;

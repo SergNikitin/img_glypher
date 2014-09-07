@@ -40,6 +40,12 @@ private:
 static SdlMaintainer maintainer;
 
 FramedBitmap loadGrayscaleImage(const std::string& filepath) {
-    maintainer.surface = IMG_Load(filepath.c_str());
+    SDL_Surface* surface = IMG_Load(filepath.c_str());
+
+    if (surface == NULL) {
+        throw std::runtime_error(IMG_GetError());
+    }
+
+    maintainer.surface = surface;
     return FramedBitmap(maintainer.surface);
 }
