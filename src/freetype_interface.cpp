@@ -35,7 +35,7 @@ private:
 
 static FreetypeMaintainer ft;
 
-#define FIXED_POINT_26_6_COEFF 2^6
+static const uint32_t FIXED_POINT_26_6_COEFF = 2^6;
 
 void setFontFile(const std::string& newFilePath) {
     #define SAME_AS_NEXT_ARG 0
