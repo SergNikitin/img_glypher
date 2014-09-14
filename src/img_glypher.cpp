@@ -26,19 +26,18 @@ uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
 }
 
 char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    static const char FIRST_ASCII_SYMBOL    = ' ';
-    static const char LAST_ASCII_SYMBOL     = '~';
+    uint8_t minDiff = 0xFF;
+    char bestMatch = ' ';
 
-    uint8_t minGrayLevelDiff = 0xFF;
-    char bestMatch = FIRST_ASCII_SYMBOL;
+    symbol_map vocabulary = getVocabulary();
 
-    for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
-        GrayscaleBitmap symbolGlyph = getBitmapForAsciiSymbol(symbol);
-        uint8_t thisSymbolDiff = calculateGrayLevelDiff(imgPart, symbolGlyph);
+    for (   symbol_map::const_iterator symbolIter = vocabulary.begin();
+            symbolIter != vocabulary.end(); ++symbolIter) {
+        uint8_t diff = calculateGrayLevelDiff(imgPart, symbolIter->second);
 
-        if (thisSymbolDiff < minGrayLevelDiff) {
-            bestMatch = symbol;
-            minGrayLevelDiff = thisSymbolDiff;
+        if (diff < minDiff) {
+            bestMatch = symbolIter->first;
+            minDiff = diff;
         }
     }
 

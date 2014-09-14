@@ -12,6 +12,7 @@ extern "C" {
 class FreetypeMaintainer {
 public:
     FreetypeMaintainer() : library(nullptr), fontFace(nullptr) {
+
         int error = FT_Init_FreeType(&library);
         if (error) {
             throw std::runtime_error("Unable to initalize Freetype library");
@@ -28,12 +29,45 @@ public:
 
     FT_Library library;
     FT_Face fontFace;
+    symbol_map vocabulary;
 
 private:
     FreetypeMaintainer(const FreetypeMaintainer&);
 };
 
 static FreetypeMaintainer ft;
+
+static GrayscaleBitmap makeBitmapForAsciiSymbol(char symbol) {
+    int error = FT_Load_Char(   ft.fontFace, static_cast<FT_ULong>(symbol),
+                                FT_LOAD_RENDER);
+
+    if (error) {
+        throw std::runtime_error("Error while loading char");
+    }
+
+    if (ft.fontFace->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+        throw std::runtime_error("Freetype symbol glyph must have bitmap format");
+    }
+
+    if (ft.fontFace->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
+        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
+    }
+
+    return GrayscaleBitmap(ft.fontFace);
+}
+
+static void initVocabulary() {
+    static const char FIRST_ASCII_SYMBOL    = ' ';
+    static const char LAST_ASCII_SYMBOL     = '~';
+
+    ft.vocabulary.clear();
+
+    for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
+        GrayscaleBitmap bitmap = makeBitmapForAsciiSymbol(symbol);
+        std::pair<char, GrayscaleBitmap> vocabularyEntry(symbol, bitmap);
+        ft.vocabulary.insert(vocabularyEntry);
+    }
+}
 
 static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
 
@@ -75,6 +109,8 @@ void setFontFile(const std::string& newFilePath) {
     if (error) {
         throw std::runtime_error("Error while setting char size");
     }
+
+    initVocabulary();
 }
 
 uint16_t getFontHeight() {
@@ -85,21 +121,10 @@ uint16_t getFontWidth() {
     return ft.fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF;
 }
 
-GrayscaleBitmap getBitmapForAsciiSymbol(char symbol) {
-    int error = FT_Load_Char(   ft.fontFace, static_cast<FT_ULong>(symbol),
-                                FT_LOAD_RENDER);
+const GrayscaleBitmap& getVocabularyEntry(char symbol) {
+    return ft.vocabulary.at(symbol);
+}
 
-    if (error) {
-        throw std::runtime_error("Error while loading char");
-    }
-
-    if (ft.fontFace->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
-        throw std::runtime_error("Freetype symbol glyph must have bitmap format");
-    }
-
-    if (ft.fontFace->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
-        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
-    }
-
-    return GrayscaleBitmap(ft.fontFace);
+const symbol_map& getVocabulary() {
+    return ft.vocabulary;
 }
