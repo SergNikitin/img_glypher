@@ -3,7 +3,7 @@
 
 typedef std::vector<gray_pixel> pixels_vector;
 
-#define FIXED_POINT_26_6_COEFF 64
+static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
 GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     : rows(fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF)
     , columns(fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF)
@@ -27,12 +27,16 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     }
 }
 
+#define COLOR_BYTE(color, fullPixel, pixFormat)                             \
+    (((fullPixel & (pixFormat)->color##mask) >> (pixFormat)->color##shift)  \
+        << (pixFormat)->color##loss)
+
 static const uint8_t MAX_GRAY_LEVELS = 255;
 static inline uint8_t rgbPixelToGrayscale(  uint32_t rgbPixel,
                                             const SDL_PixelFormat* fmt) {
-    uint8_t r = ((rgbPixel & fmt->Rmask) >> fmt->Rshift) << fmt->Rloss;
-    uint8_t g = ((rgbPixel & fmt->Gmask) >> fmt->Gshift) << fmt->Gloss;
-    uint8_t b = ((rgbPixel & fmt->Bmask) >> fmt->Bshift) << fmt->Bloss;
+    uint8_t r = COLOR_BYTE(R, rgbPixel, fmt);
+    uint8_t g = COLOR_BYTE(G, rgbPixel, fmt);
+    uint8_t b = COLOR_BYTE(B, rgbPixel, fmt);
 
     uint8_t grayLevel =   0.212671f * r
                         + 0.715160f * g
@@ -112,8 +116,8 @@ FrameSlider::~FrameSlider() {}
 void FrameSlider::slide() {
     int16_t newLeftBorder, newTopBorder;
 
-    int16_t frameToRightColPos = leftBorderCol + width;
-    int16_t frameBelowRowPos = topBorderRow + height;
+    int16_t frameToRightColPos  = leftBorderCol + width;
+    int16_t frameBelowRowPos    = topBorderRow  + height;
 
     if (frameToRightColPos + width < map->columns) {
         newline = false;
