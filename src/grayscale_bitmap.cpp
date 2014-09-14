@@ -15,19 +15,24 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     int16_t leftBearing         = fontFace->glyph->bitmap_left;
     int16_t fromTopToSymbol     = baselineRow - fontFace->glyph->bitmap_top;
     const FT_Bitmap* ftBitmap   = &fontFace->glyph->bitmap;
+    const int32_t vectorSize    = pixels->size();
 
     for (int16_t symbolRow = 0; symbolRow < ftBitmap->rows; ++symbolRow) {
         for (int16_t symbolCol = 0; symbolCol < ftBitmap->width; ++symbolCol) {
             int16_t bitmapRow = fromTopToSymbol + symbolRow;
             int16_t bitmapCol = leftBearing + symbolCol;
 
-            pixels->at(bitmapRow*columns + bitmapCol)
-                = ftBitmap->buffer[symbolRow*ftBitmap->width + symbolCol];
+            int32_t vectorPos = bitmapRow*columns + bitmapCol;
+            // to not crash on symbols that are bigger then their box borders
+            if (vectorPos < vectorSize) {
+                int32_t bufferPos = symbolRow*ftBitmap->width + symbolCol;
+                pixels->at(vectorPos) = ftBitmap->buffer[bufferPos];
+            }
         }
     }
 }
 
-#define COLOR_BYTE(color, fullPixel, pixFormat)                             \
+#define COLOR_BYTE(color, fullPixel, pixFormat)                         \
     (((fullPixel & pixFormat->color##mask) >> pixFormat->color##shift)  \
         << pixFormat->color##loss)
 
