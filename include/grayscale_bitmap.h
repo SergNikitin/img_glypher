@@ -5,10 +5,12 @@
 #include <vector>
 #include <stdexcept>
 
-#include "ft2build.h"
-#include FT_FREETYPE_H
+extern "C" {
+    #include "ft2build.h"
+    #include FT_FREETYPE_H
 
-#include "SDL.h"
+    #include "SDL.h"
+}
 
 typedef unsigned char gray_pixel;
 typedef std::unique_ptr<std::vector<gray_pixel>> unique_pixels_ptr;

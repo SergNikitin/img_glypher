@@ -43,11 +43,11 @@ char chooseMatchingSymbol(const FrameSlider& imgPart) {
     return bestMatch;
 }
 
-void imageToText(std::string image, std::string font) {
+void imageToText(std::string imgPath, std::string imgFont) {
     std::ofstream outfile("test.txt");
 
-    setFontFile(font);
-    FramedBitmap map = loadGrayscaleImage(image);
+    setFontFile(imgFont);
+    FramedBitmap map = loadGrayscaleImage(imgPath);
 
     FrameSlider lastFrame   = map.lastFrame(getFontWidth(), getFontHeight());
     FrameSlider frame       = map.firstFrame(getFontWidth(), getFontHeight());

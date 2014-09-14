@@ -1,7 +1,9 @@
 #include <exception>
 
-#include "SDL.h"
-#include "SDL_image.h"
+extern "C" {
+    #include "SDL.h"
+    #include "SDL_image.h"
+}
 
 #include "sdl_interface.h"
 
@@ -37,7 +39,7 @@ private:
     SdlMaintainer(const SdlMaintainer&);
 };
 
-static SdlMaintainer maintainer;
+static SdlMaintainer sdl;
 
 FramedBitmap loadGrayscaleImage(const std::string& filepath) {
     SDL_Surface* surface = IMG_Load(filepath.c_str());
@@ -46,6 +48,6 @@ FramedBitmap loadGrayscaleImage(const std::string& filepath) {
         throw std::runtime_error(IMG_GetError());
     }
 
-    maintainer.surface = surface;
-    return FramedBitmap(maintainer.surface);
+    sdl.surface = surface;
+    return FramedBitmap(sdl.surface);
 }
