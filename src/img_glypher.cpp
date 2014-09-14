@@ -10,8 +10,6 @@
 uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
                                 const GrayscaleBitmap& glyph) {
     if (imgPart.size() != (int32_t)glyph.rows * glyph.columns) {
-        std::cout << imgPart.size() << " " << (int32_t)glyph.rows * glyph.columns
-                    << std::endl;
         throw std::runtime_error("Sizes of image part and symbol glyph do not match");
     }
 
