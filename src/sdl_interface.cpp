@@ -11,7 +11,7 @@ extern "C" {
 
 class SdlMaintainer {
 public:
-    SdlMaintainer() : surface(nullptr) {
+    SdlMaintainer() {
         int error = SDL_Init(NO_EXTRA_SUBMODULES);
         if (error) {
             throw std::runtime_error(SDL_GetError());
@@ -25,15 +25,9 @@ public:
     };
 
     virtual ~SdlMaintainer() {
-        if (surface != nullptr) {
-            SDL_FreeSurface(surface);
-        }
-
         IMG_Quit();
         SDL_Quit();
     }
-
-    SDL_Surface* surface;
 
 private:
     SdlMaintainer(const SdlMaintainer&);
@@ -41,13 +35,31 @@ private:
 
 static SdlMaintainer sdl;
 
-FramedBitmap loadGrayscaleImage(const std::string& filepath) {
-    SDL_Surface* surface = IMG_Load(filepath.c_str());
+static void safeLockSurface(SDL_Surface* surface) {
+    int error = SDL_LockSurface(surface);
 
-    if (surface == NULL) {
+    if (error) {
+        throw std::runtime_error("Unable to lock surface");
+    }
+}
+
+FramedBitmap loadGrayscaleImage(const std::string& filepath) {
+    SDL_Surface* source = IMG_Load(filepath.c_str());
+
+    if (source == NULL) {
         throw std::runtime_error(IMG_GetError());
     }
 
-    sdl.surface = surface;
-    return FramedBitmap(sdl.surface);
+    static const uint32_t UNUSED_FLAGS = 0;
+    SDL_Surface* converted = SDL_ConvertSurfaceFormat(  source,
+                                                        SDL_PIXELFORMAT_RGB888,
+                                                        UNUSED_FLAGS);
+    safeLockSurface(converted);
+    FramedBitmap bitmap(converted);
+    SDL_UnlockSurface(converted);
+
+    SDL_FreeSurface(source);
+    SDL_FreeSurface(converted);
+
+    return bitmap;
 }

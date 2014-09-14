@@ -13,7 +13,8 @@ extern "C" {
 }
 
 typedef unsigned char gray_pixel;
-typedef std::unique_ptr<std::vector<gray_pixel>> unique_pixels_ptr;
+typedef std::vector<gray_pixel> pixels_vector;
+typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
 
 class GrayscaleBitmap {
 public:

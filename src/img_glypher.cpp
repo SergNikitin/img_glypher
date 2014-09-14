@@ -26,11 +26,11 @@ uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
 }
 
 char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    static const char FIRST_ASCII_SYMBOL    = static_cast<char>(32);
-    static const char LAST_ASCII_SYMBOL     = static_cast<char>(126);
+    static const char FIRST_ASCII_SYMBOL    = ' ';
+    static const char LAST_ASCII_SYMBOL     = '~';
 
     uint8_t minGrayLevelDiff = 0xFF;
-    char bestMatch = ' ';
+    char bestMatch = FIRST_ASCII_SYMBOL;
 
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap symbolGlyph = getBitmapForAsciiSymbol(symbol);

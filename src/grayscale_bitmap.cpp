@@ -1,8 +1,6 @@
 #include <exception>
 #include "grayscale_bitmap.h"
 
-typedef std::vector<gray_pixel> pixels_vector;
-
 static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
 GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     : rows(fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF)
@@ -55,28 +53,18 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     , pixels(new pixels_vector(surface->h * surface->w, 0))
     , num_grays(MAX_GRAY_LEVELS) {
 
-    static const uint32_t UNUSED_FLAGS = 0;
-    SDL_Surface* surfaceCopy = SDL_ConvertSurfaceFormat(surface,
-                                                        SDL_PIXELFORMAT_RGB888,
-                                                        UNUSED_FLAGS);
-
-    SDL_LockSurface(surfaceCopy);
-
-    const uint8_t bytesPerPixel = surfaceCopy->format->BytesPerPixel;
+    const uint8_t bytesPerPixel = surface->format->BytesPerPixel;
     for (int16_t thisRow = 0; thisRow < rows; ++thisRow) {
         for (int16_t thisColumn = 0; thisColumn < columns; ++thisColumn) {
             uint32_t pixelNum = thisRow * columns + thisColumn;
-            uint8_t* pixelDataStart = (uint8_t*)surfaceCopy->pixels
+            uint8_t* pixelDataStart = (uint8_t*)surface->pixels
                                                 + pixelNum * bytesPerPixel;
             uint32_t rgbPixel = *(uint32_t*)pixelDataStart;
             uint8_t grayLevel = rgbPixelToGrayscale(rgbPixel,
-                                                    surfaceCopy->format);
+                                                    surface->format);
             pixels->at(pixelNum) = grayLevel;
         }
     }
-
-    SDL_UnlockSurface(surfaceCopy);
-    SDL_FreeSurface(surfaceCopy);
 }
 
 GrayscaleBitmap::GrayscaleBitmap(const GrayscaleBitmap& toCopy)
