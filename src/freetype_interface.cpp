@@ -35,14 +35,16 @@ private:
 
 static FreetypeMaintainer ft;
 
-#define SAME_AS_NEXT_ARG 0
-#define HORIZ_RESOLUTION 72
-#define VERTICAL_RESOLUTION HORIZ_RESOLUTION
 #define FIXED_POINT_26_6_COEFF 2^6
 
 void setFontFile(const std::string& newFilePath) {
+    #define SAME_AS_NEXT_ARG 0
+    static const FT_UInt DEFAULT_HORIZ_RES          = 72;
+    static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
+    static const FT_Long FIRST_FACE_IN_FONT_INDEX   = 0;
+
     int error = FT_New_Face(ft.library, newFilePath.c_str(),
-                            0, &ft.fontFace);
+                            FIRST_FACE_IN_FONT_INDEX, &ft.fontFace);
 
     if (error == FT_Err_Unknown_File_Format) {
         std::stringstream err;
@@ -67,8 +69,8 @@ void setFontFile(const std::string& newFilePath) {
 
     error = FT_Set_Char_Size(ft.fontFace,   SAME_AS_NEXT_ARG,
                                             16 * FIXED_POINT_26_6_COEFF,
-                                            HORIZ_RESOLUTION,
-                                            VERTICAL_RESOLUTION);
+                                            DEFAULT_HORIZ_RES,
+                                            DEFAULT_VERTICAL_RES);
 
     if (error) {
         throw std::runtime_error("Error while setting char size");
@@ -84,7 +86,8 @@ uint16_t getFontWidth() {
 }
 
 GrayscaleBitmap getBitmapForAsciiSymbol(char symbol) {
-    int error = FT_Load_Char(ft.fontFace, (FT_ULong)symbol, FT_LOAD_RENDER);
+    int error = FT_Load_Char(   ft.fontFace, static_cast<FT_ULong>(symbol),
+                                FT_LOAD_RENDER);
 
     if (error) {
         throw std::runtime_error("Error while loading char");
