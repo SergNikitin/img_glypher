@@ -28,8 +28,8 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
 }
 
 #define COLOR_BYTE(color, fullPixel, pixFormat)                             \
-    (((fullPixel & (pixFormat)->color##mask) >> (pixFormat)->color##shift)  \
-        << (pixFormat)->color##loss)
+    (((fullPixel & pixFormat->color##mask) >> pixFormat->color##shift)  \
+        << pixFormat->color##loss)
 
 static const uint8_t MAX_GRAY_LEVELS = 255;
 static inline uint8_t rgbPixelToGrayscale(  uint32_t rgbPixel,
@@ -90,12 +90,11 @@ FrameSlider FramedBitmap::firstFrame(const int16_t width, const int16_t height) 
 }
 
 FrameSlider FramedBitmap::lastFrame(const int16_t width, const int16_t height) {
-    int16_t leftBorderCol = columns - width - columns % width;
-    int16_t topBorderRow = rows - height - rows % height;
+    int16_t leftBorderCol   = columns   - columns % width   - width;
+    int16_t topBorderRow    = rows      - rows % height     - height;
 
     return FrameSlider(*this, width, height, leftBorderCol, topBorderRow);
 }
-
 
 FrameSlider::FrameSlider(const FramedBitmap& _map,
                         const int16_t _width, const int16_t _height,
@@ -103,10 +102,8 @@ FrameSlider::FrameSlider(const FramedBitmap& _map,
     : newline(false), map(&_map), width(_width), height(_height)
     , leftBorderCol(_leftBorderCol), topBorderRow(_topBorderRow) {
 
-    if (    width >= map->columns
-        ||  height >= map->rows
-        ||  leftBorderCol + width >= map->columns
-        ||  topBorderRow + height >= map->rows) {
+    if (    leftBorderCol + width > map->columns
+        ||  topBorderRow + height > map->rows) {
         throw std::out_of_range("Specified frame is out of given bitmap borders");
     }
 }
@@ -116,18 +113,18 @@ FrameSlider::~FrameSlider() {}
 void FrameSlider::slide() {
     int16_t newLeftBorder, newTopBorder;
 
-    int16_t frameToRightColPos  = leftBorderCol + width;
-    int16_t frameBelowRowPos    = topBorderRow  + height;
+    int16_t colPosOfFrameToRight  = leftBorderCol + width;
+    int16_t rowPosOfFrameBelow    = topBorderRow  + height;
 
-    if (frameToRightColPos + width < map->columns) {
+    if (colPosOfFrameToRight + width <= map->columns) {
         newline = false;
-        newLeftBorder = frameToRightColPos;
+        newLeftBorder = colPosOfFrameToRight;
         newTopBorder = topBorderRow;
     }
-    else if (frameBelowRowPos + height < map->rows) {
+    else if (rowPosOfFrameBelow + height <= map->rows) {
         newline = true;
         newLeftBorder = 0;
-        newTopBorder = frameBelowRowPos;
+        newTopBorder = rowPosOfFrameBelow;
     }
     else {
         throw std::out_of_range("Can't slide out of bitmap range");

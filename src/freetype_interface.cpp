@@ -68,7 +68,7 @@ void setFontFile(const std::string& newFilePath) {
     }
 
     error = FT_Set_Char_Size(ft.fontFace,   SAME_AS_NEXT_ARG,
-                                            16 * FIXED_POINT_26_6_COEFF,
+                                            10 * FIXED_POINT_26_6_COEFF,
                                             DEFAULT_HORIZ_RES,
                                             DEFAULT_VERTICAL_RES);
 
