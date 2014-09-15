@@ -9,7 +9,7 @@ extern "C" {
 #include "freetype_interface.h"
 #include "grayscale_bitmap.h"
 
-class FreetypeMaintainer {
+static class FreetypeMaintainer {
 public:
     FreetypeMaintainer() : library(nullptr), fontFace(nullptr) {
 
@@ -33,11 +33,9 @@ public:
 
 private:
     FreetypeMaintainer(const FreetypeMaintainer&);
-};
+} ft;
 
-static FreetypeMaintainer ft;
-
-static GrayscaleBitmap makeBitmapForAsciiSymbol(char symbol) {
+static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
     int error = FT_Load_Char(   ft.fontFace, static_cast<FT_ULong>(symbol),
                                 FT_LOAD_RENDER);
 
@@ -63,32 +61,32 @@ static void initVocabulary() {
     ft.vocabulary.clear();
 
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
-        GrayscaleBitmap bitmap = makeBitmapForAsciiSymbol(symbol);
-        std::pair<char, GrayscaleBitmap> vocabularyEntry(symbol, bitmap);
-        ft.vocabulary.insert(vocabularyEntry);
+        GrayscaleBitmap bitmap = asciiSymbolToBitmap(symbol);
+        std::pair<char, GrayscaleBitmap> entry(symbol, bitmap);
+        ft.vocabulary.insert(entry);
     }
 }
 
 static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
 
-void setFontFile(const std::string& newFilePath) {
+void setFontFile(const std::string& filepath) {
     #define SAME_AS_NEXT_ARG 0
     static const FT_UInt DEFAULT_HORIZ_RES          = 72;
     static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
     static const FT_Long FIRST_FACE_IN_FONT_INDEX   = 0;
 
-    int error = FT_New_Face(ft.library, newFilePath.c_str(),
+    int error = FT_New_Face(ft.library, filepath.c_str(),
                             FIRST_FACE_IN_FONT_INDEX, &ft.fontFace);
 
     if (error == FT_Err_Unknown_File_Format) {
         std::stringstream err;
-        err << "The font file '" << newFilePath << "' could be opened and read, "
+        err << "The font file '" << filepath << "' could be opened and read, "
             << "but it appears that its font format is unsupported";
         throw std::runtime_error(err.str());
     }
     else if (error) {
         std::stringstream err;
-        err << "The font file '" << newFilePath << "' either could not "
+        err << "The font file '" << filepath << "' either could not "
             << "be opened and read, or it is simply broken";
         throw std::runtime_error(err.str());
     }

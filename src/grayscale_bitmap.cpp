@@ -54,14 +54,14 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     , num_grays(MAX_GRAY_LEVELS) {
 
     const uint8_t bytesPerPixel = surface->format->BytesPerPixel;
-    for (int16_t thisRow = 0; thisRow < rows; ++thisRow) {
-        for (int16_t thisColumn = 0; thisColumn < columns; ++thisColumn) {
-            uint32_t pixelNum = thisRow * columns + thisColumn;
+    for (int16_t row = 0; row < rows; ++row) {
+        for (int16_t col = 0; col < columns; ++col) {
+            uint32_t pixelNum = row * columns + col;
             uint8_t* pixelDataStart = (uint8_t*)surface->pixels
                                                 + pixelNum * bytesPerPixel;
             uint32_t rgbPixel = *(uint32_t*)pixelDataStart;
-            uint8_t grayLevel = rgbPixelToGrayscale(rgbPixel,
-                                                    surface->format);
+
+            uint8_t grayLevel = rgbPixelToGrayscale(rgbPixel, surface->format);
             pixels->at(pixelNum) = grayLevel;
         }
     }
@@ -78,11 +78,13 @@ GrayscaleBitmap::~GrayscaleBitmap() {}
 FramedBitmap::FramedBitmap(SDL_Surface* surface) : GrayscaleBitmap(surface) {}
 FramedBitmap::FramedBitmap(const FramedBitmap& map) : GrayscaleBitmap(map) {}
 
-FrameSlider FramedBitmap::firstFrame(const int16_t width, const int16_t height) {
+FrameSlider FramedBitmap::firstFrame(   const int16_t width,
+                                        const int16_t height) const {
     return FrameSlider(*this, width, height);
 }
 
-FrameSlider FramedBitmap::lastFrame(const int16_t width, const int16_t height) {
+const FrameSlider FramedBitmap::lastFrame(  const int16_t width,
+                                            const int16_t height) const {
     int16_t leftBorderCol   = columns   - columns % width   - width;
     int16_t topBorderRow    = rows      - rows % height     - height;
 

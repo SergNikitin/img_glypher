@@ -9,7 +9,7 @@ extern "C" {
 
 #define NO_EXTRA_SUBMODULES 0
 
-class SdlMaintainer {
+static class SdlMaintainer {
 public:
     SdlMaintainer() {
         int error = SDL_Init(NO_EXTRA_SUBMODULES);
@@ -31,9 +31,7 @@ public:
 
 private:
     SdlMaintainer(const SdlMaintainer&);
-};
-
-static SdlMaintainer sdl;
+} sdl;
 
 static void safeLockSurface(SDL_Surface* surface) {
     int error = SDL_LockSurface(surface);

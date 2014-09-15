@@ -42,11 +42,11 @@ char chooseMatchingSymbol(const FrameSlider& imgPart) {
     return bestMatch;
 }
 
-void imageToText(std::string imgPath, std::string imgFont) {
+void imageToText(std::string imgPath, std::string fontPath) {
     std::ofstream outfile("test.txt");
 
-    setFontFile(imgFont);
-    FramedBitmap map = loadGrayscaleImage(imgPath);
+    setFontFile(fontPath);
+    const FramedBitmap map = loadGrayscaleImage(imgPath);
 
     FrameSlider lastFrame   = map.lastFrame(getFontWidth(), getFontHeight());
     FrameSlider frame       = map.firstFrame(getFontWidth(), getFontHeight());
@@ -78,6 +78,9 @@ int main(int argc, char* argv[]) {
     }
     catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception caught" << std::endl;
     }
 
     return 0;

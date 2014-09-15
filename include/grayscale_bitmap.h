@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include <stdexcept>
 
 extern "C" {
     #include "ft2build.h"
@@ -42,8 +41,8 @@ public:
     FramedBitmap(const FramedBitmap&);
     FramedBitmap(SDL_Surface*);
 
-    FrameSlider firstFrame(const int16_t width, const int16_t height);
-    FrameSlider lastFrame( const int16_t width, const int16_t height);
+    FrameSlider       firstFrame(const int16_t width, const int16_t height) const;
+    const FrameSlider lastFrame( const int16_t width, const int16_t height) const;
 
 private:
     FramedBitmap();
