@@ -35,6 +35,16 @@ private:
     FreetypeMaintainer(const FreetypeMaintainer&);
 } ft;
 
+static void checkGlyphFormat(const FT_GlyphSlot glyph) {
+    if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+        throw std::runtime_error("Freetype symbol glyph must have bitmap format");
+    }
+
+    if (glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
+        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
+    }
+}
+
 static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
     int error = FT_Load_Char(   ft.fontFace, static_cast<FT_ULong>(symbol),
                                 FT_LOAD_RENDER);
@@ -43,13 +53,7 @@ static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
         throw std::runtime_error("Error while loading char");
     }
 
-    if (ft.fontFace->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
-        throw std::runtime_error("Freetype symbol glyph must have bitmap format");
-    }
-
-    if (ft.fontFace->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
-        throw std::runtime_error("Given Freetype bitmap is not 8-bit grayscale");
-    }
+    checkGlyphFormat(ft.fontFace->glyph);
 
     return GrayscaleBitmap(ft.fontFace);
 }
@@ -67,46 +71,60 @@ static void initVocabulary() {
     }
 }
 
-static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
+static void loadDefaultFaceFromFontFile(const std::string& fontPath,
+                                        FT_Library freetypeLib,
+                                        FT_Face faceContainer) {
+    static const FT_Long INDEX_OF_FIRST_FACE_IN_FONT = 0;
 
-void setFontFile(const std::string& filepath) {
-    #define SAME_AS_NEXT_ARG 0
-    static const FT_UInt DEFAULT_HORIZ_RES          = 72;
-    static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
-    static const FT_Long FIRST_FACE_IN_FONT_INDEX   = 0;
-
-    int error = FT_New_Face(ft.library, filepath.c_str(),
-                            FIRST_FACE_IN_FONT_INDEX, &ft.fontFace);
+    int error = FT_New_Face(freetypeLib, fontPath.c_str(),
+                            INDEX_OF_FIRST_FACE_IN_FONT, &faceContainer);
 
     if (error == FT_Err_Unknown_File_Format) {
         std::stringstream err;
-        err << "The font file '" << filepath << "' could be opened and read, "
+        err << "The font file '" << fontPath << "' could be opened and read, "
             << "but it appears that its font format is unsupported";
         throw std::runtime_error(err.str());
     }
     else if (error) {
         std::stringstream err;
-        err << "The font file '" << filepath << "' either could not "
+        err << "The font file '" << fontPath << "' either could not "
             << "be opened and read, or it is simply broken";
         throw std::runtime_error(err.str());
     }
+}
 
-    if (!FT_IS_FIXED_WIDTH(ft.fontFace)) {
+static void checkFontfaceFormat(FT_Face face) {
+    if (!FT_IS_FIXED_WIDTH(face)) {
         throw std::runtime_error("Loaded font face must be monospaced");
     }
 
-    if (!FT_IS_SCALABLE(ft.fontFace)) {
+    if (!FT_IS_SCALABLE(face)) {
         throw std::runtime_error("Loaded font face must be scaleble");
     }
+}
 
-    error = FT_Set_Char_Size(ft.fontFace,   SAME_AS_NEXT_ARG,
-                                            10 * FIXED_POINT_26_6_COEFF,
-                                            DEFAULT_HORIZ_RES,
-                                            DEFAULT_VERTICAL_RES);
+static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
+static void setCharSizeInPoints(FT_Face face, uint32_t size,
+                                uint16_t horizRes, uint16_t verticalRes) {
+    static const uint32_t SAME_AS_NEXT_ARG = 0;
+
+    int error = FT_Set_Char_Size(face,      SAME_AS_NEXT_ARG,
+                                            size * FIXED_POINT_26_6_COEFF,
+                                            horizRes, verticalRes);
 
     if (error) {
         throw std::runtime_error("Error while setting char size");
     }
+}
+
+void setFontFile(const std::string& filepath) {
+    static const FT_UInt DEFAULT_HORIZ_RES          = 72;
+    static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
+
+    loadDefaultFaceFromFontFile(filepath, ft.library, ft.fontFace);
+    checkFontfaceFormat(ft.fontFace);
+    setCharSizeInPoints(ft.fontFace, 10, DEFAULT_HORIZ_RES,
+                        DEFAULT_VERTICAL_RES);
 
     initVocabulary();
 }
