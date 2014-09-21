@@ -7,7 +7,7 @@ extern "C" {
 
 #include "sdl_interface.h"
 
-#define NO_EXTRA_SUBMODULES 0
+static const uint16_t NO_EXTRA_SUBMODULES = 0;
 
 static class SdlMaintainer {
 public:
