@@ -42,7 +42,7 @@ char chooseMatchingSymbol(const FrameSlider& imgPart) {
     return bestMatch;
 }
 
-void imageToText(std::string imgPath, std::string fontPath) {
+void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
     setFontFile(fontPath);

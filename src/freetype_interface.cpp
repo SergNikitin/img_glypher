@@ -35,7 +35,7 @@ private:
     FreetypeMaintainer(const FreetypeMaintainer&);
 } ft;
 
-static void checkGlyphFormat(const FT_GlyphSlot glyph) {
+static void checkGlyphFormat(const FT_GlyphSlot& glyph) {
     if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
         throw std::runtime_error("Freetype symbol glyph must have bitmap format");
     }
@@ -72,8 +72,8 @@ static void initVocabulary() {
 }
 
 static void loadDefaultFaceFromFontFile(const std::string& fontPath,
-                                        FT_Library freetypeLib,
-                                        FT_Face faceContainer) {
+                                        const FT_Library& freetypeLib,
+                                        FT_Face& faceContainer) {
     static const FT_Long INDEX_OF_FIRST_FACE_IN_FONT = 0;
 
     int error = FT_New_Face(freetypeLib, fontPath.c_str(),
@@ -93,7 +93,7 @@ static void loadDefaultFaceFromFontFile(const std::string& fontPath,
     }
 }
 
-static void checkFontfaceFormat(FT_Face face) {
+static void checkFontfaceFormat(FT_Face& face) {
     if (!FT_IS_FIXED_WIDTH(face)) {
         throw std::runtime_error("Loaded font face must be monospaced");
     }
@@ -104,7 +104,7 @@ static void checkFontfaceFormat(FT_Face face) {
 }
 
 static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
-static void setCharSizeInPoints(FT_Face face, uint32_t size,
+static void setCharSizeInPoints(FT_Face& face, uint32_t size,
                                 uint16_t horizRes, uint16_t verticalRes) {
     static const uint32_t SAME_AS_NEXT_ARG = 0;
 
