@@ -24,10 +24,10 @@ public:
 
     virtual ~GrayscaleBitmap();
 
-    const int16_t rows;
-    const int16_t columns;
+    const size_t rows;
+    const size_t columns;
     const unique_pixels_ptr pixels;
-    const uint8_t num_grays;
+    const uint_fast8_t num_grays;
 
 private:
     GrayscaleBitmap();
@@ -41,8 +41,8 @@ public:
     FramedBitmap(const FramedBitmap&);
     FramedBitmap(SDL_Surface*);
 
-    FrameSlider       firstFrame(const int16_t width, const int16_t height) const;
-    const FrameSlider lastFrame( const int16_t width, const int16_t height) const;
+    FrameSlider       firstFrame(const size_t width, const size_t height) const;
+    const FrameSlider lastFrame( const size_t width, const size_t height) const;
 
 private:
     FramedBitmap();
@@ -51,14 +51,14 @@ private:
 class FrameSlider {
 public:
     FrameSlider(const FramedBitmap& _map,
-                const int16_t _width, const int16_t _height,
-                int16_t _leftBorderCol = 0, int16_t _topBorderRow = 0);
+                const size_t _width, const size_t _height,
+                size_t _leftBorderCol = 0, size_t _topBorderRow = 0);
 
     virtual ~FrameSlider();
 
     void slide();
-    gray_pixel at(int32_t pos) const;
-    int32_t size() const;
+    gray_pixel at(size_t pos) const;
+    size_t size() const;
 
     bool operator==(const FrameSlider&) const;
     bool operator!=(const FrameSlider&) const;
@@ -67,10 +67,10 @@ public:
 
 private:
     const FramedBitmap* map;
-    const int16_t width;
-    const int16_t height;
-    int16_t leftBorderCol;
-    int16_t topBorderRow;
+    const size_t width;
+    const size_t height;
+    size_t leftBorderCol;
+    size_t topBorderRow;
 
 
     FrameSlider();

@@ -8,22 +8,25 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     , pixels(new pixels_vector(rows*columns, 0))
     , num_grays(fontFace->glyph->bitmap.num_grays) {
 
-    int16_t baselineRow         = fontFace->size->metrics.ascender
+    size_t baselineRow         = fontFace->size->metrics.ascender
                                     / FIXED_POINT_26_6_COEFF;
-    int16_t leftBearing         = fontFace->glyph->bitmap_left;
-    int16_t fromTopToSymbol     = baselineRow - fontFace->glyph->bitmap_top;
+    size_t leftBearing         = fontFace->glyph->bitmap_left;
+    size_t fromTopToSymbol     = baselineRow - fontFace->glyph->bitmap_top;
     const FT_Bitmap* ftBitmap   = &fontFace->glyph->bitmap;
-    const int32_t vectorSize    = pixels->size();
+    const size_t vectorSize    = pixels->size();
 
-    for (int16_t symbolRow = 0; symbolRow < ftBitmap->rows; ++symbolRow) {
-        for (int16_t symbolCol = 0; symbolCol < ftBitmap->width; ++symbolCol) {
-            int16_t bitmapRow = fromTopToSymbol + symbolRow;
-            int16_t bitmapCol = leftBearing + symbolCol;
+    size_t symbolRows = (size_t)ftBitmap->rows;
+    size_t symbolCols = (size_t)ftBitmap->width;
 
-            int32_t vectorPos = bitmapRow*columns + bitmapCol;
+    for (size_t symbolRow = 0; symbolRow < symbolRows; ++symbolRow) {
+        for (size_t symbolCol = 0; symbolCol < symbolCols; ++symbolCol) {
+            size_t bitmapRow = fromTopToSymbol + symbolRow;
+            size_t bitmapCol = leftBearing + symbolCol;
+
+            size_t vectorPos = bitmapRow*columns + bitmapCol;
             // to not crash on symbols that are bigger then their box borders
             if (vectorPos < vectorSize) {
-                int32_t bufferPos = symbolRow*ftBitmap->width + symbolCol;
+                size_t bufferPos = symbolRow*ftBitmap->width + symbolCol;
                 pixels->at(vectorPos) = ftBitmap->buffer[bufferPos];
             }
         }
@@ -34,14 +37,14 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     (((fullPixel & pixFormat->color##mask) >> pixFormat->color##shift)  \
         << pixFormat->color##loss)
 
-static const uint8_t MAX_GRAY_LEVELS = 255;
-static inline uint8_t rgbPixelToGrayscale(  uint32_t rgbPixel,
-                                            const SDL_PixelFormat* fmt) {
-    uint8_t r = COLOR_BYTE(R, rgbPixel, fmt);
-    uint8_t g = COLOR_BYTE(G, rgbPixel, fmt);
-    uint8_t b = COLOR_BYTE(B, rgbPixel, fmt);
+static const uint_fast8_t MAX_GRAY_LEVELS = 255;
+static inline uint_fast8_t rgbPixelToGrayscale( uint32_t rgbPixel,
+                                                const SDL_PixelFormat* fmt) {
+    uint_fast8_t r = COLOR_BYTE(R, rgbPixel, fmt);
+    uint_fast8_t g = COLOR_BYTE(G, rgbPixel, fmt);
+    uint_fast8_t b = COLOR_BYTE(B, rgbPixel, fmt);
 
-    uint8_t grayLevel =   0.212671f * r
+    uint_fast8_t grayLevel =   0.212671f * r
                         + 0.715160f * g
                         + 0.072169f * b;
 
@@ -53,15 +56,15 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     , pixels(new pixels_vector(surface->h * surface->w, 0))
     , num_grays(MAX_GRAY_LEVELS) {
 
-    const uint8_t bytesPerPixel = surface->format->BytesPerPixel;
-    for (int16_t row = 0; row < rows; ++row) {
-        for (int16_t col = 0; col < columns; ++col) {
-            uint32_t pixelNum = row * columns + col;
+    const uint_fast8_t bytesPerPixel = surface->format->BytesPerPixel;
+    for (size_t row = 0; row < rows; ++row) {
+        for (size_t col = 0; col < columns; ++col) {
+            size_t pixelNum = row * columns + col;
             uint8_t* pixelDataStart = (uint8_t*)surface->pixels
                                                 + pixelNum * bytesPerPixel;
             uint32_t rgbPixel = *(uint32_t*)pixelDataStart;
 
-            uint8_t grayLevel = rgbPixelToGrayscale(rgbPixel, surface->format);
+            uint_fast8_t grayLevel = rgbPixelToGrayscale(rgbPixel, surface->format);
             pixels->at(pixelNum) = grayLevel;
         }
     }
@@ -78,22 +81,22 @@ GrayscaleBitmap::~GrayscaleBitmap() {}
 FramedBitmap::FramedBitmap(SDL_Surface* surface) : GrayscaleBitmap(surface) {}
 FramedBitmap::FramedBitmap(const FramedBitmap& map) : GrayscaleBitmap(map) {}
 
-FrameSlider FramedBitmap::firstFrame(   const int16_t width,
-                                        const int16_t height) const {
+FrameSlider FramedBitmap::firstFrame(   const size_t width,
+                                        const size_t height) const {
     return FrameSlider(*this, width, height);
 }
 
-const FrameSlider FramedBitmap::lastFrame(  const int16_t width,
-                                            const int16_t height) const {
-    int16_t leftBorderCol   = columns   - columns % width   - width;
-    int16_t topBorderRow    = rows      - rows % height     - height;
+const FrameSlider FramedBitmap::lastFrame(  const size_t width,
+                                            const size_t height) const {
+    size_t leftBorderCol    = columns   - columns % width   - width;
+    size_t topBorderRow     = rows      - rows % height     - height;
 
     return FrameSlider(*this, width, height, leftBorderCol, topBorderRow);
 }
 
 FrameSlider::FrameSlider(const FramedBitmap& _map,
-                        const int16_t _width, const int16_t _height,
-                        int16_t _leftBorderCol, int16_t _topBorderRow)
+                        const size_t _width, const size_t _height,
+                        size_t _leftBorderCol, size_t _topBorderRow)
     : newline(false), map(&_map), width(_width), height(_height)
     , leftBorderCol(_leftBorderCol), topBorderRow(_topBorderRow) {
 
@@ -106,22 +109,20 @@ FrameSlider::FrameSlider(const FramedBitmap& _map,
 FrameSlider::~FrameSlider() {}
 
 void FrameSlider::slide() {
-    int16_t newLeftBorder, newTopBorder;
+    size_t newLeftBorder, newTopBorder;
 
-    int16_t colPosOfFrameToRight  = leftBorderCol + width;
-    int16_t rowPosOfFrameBelow    = topBorderRow  + height;
+    size_t colPosOfFrameToRight  = leftBorderCol + width;
+    size_t rowPosOfFrameBelow    = topBorderRow  + height;
 
     if (colPosOfFrameToRight + width <= map->columns) {
         newline = false;
         newLeftBorder = colPosOfFrameToRight;
         newTopBorder = topBorderRow;
-    }
-    else if (rowPosOfFrameBelow + height <= map->rows) {
+    } else if (rowPosOfFrameBelow + height <= map->rows) {
         newline = true;
         newLeftBorder = 0;
         newTopBorder = rowPosOfFrameBelow;
-    }
-    else {
+    } else {
         throw std::out_of_range("Can't slide out of bitmap range");
     }
 
@@ -129,19 +130,19 @@ void FrameSlider::slide() {
     topBorderRow = newTopBorder;
 }
 
-gray_pixel FrameSlider::at(int32_t pos) const {
+gray_pixel FrameSlider::at(size_t pos) const {
     if (pos >= width * height) {
         throw std::out_of_range("Out of frame borders");
     }
 
-    int16_t mapRow = topBorderRow + pos / width;
-    int16_t mapColumn = leftBorderCol + pos % width;
+    size_t mapRow = topBorderRow + pos / width;
+    size_t mapColumn = leftBorderCol + pos % width;
 
     return map->pixels->at(mapRow * map->columns + mapColumn);
 }
 
-int32_t FrameSlider::size() const {
-    return (int32_t)width * height;
+size_t FrameSlider::size() const {
+    return width * height;
 }
 
 bool FrameSlider::operator==(const FrameSlider& toCompare) const {
