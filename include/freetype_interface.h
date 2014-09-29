@@ -7,8 +7,8 @@
 typedef std::map<unsigned char, GrayscaleBitmap> symbol_map;
 
 void setFontFile(const std::string& newFilePath);
-uint16_t getFontHeight();
-uint16_t getFontWidth();
+uint_fast16_t getFontHeight();
+uint_fast16_t getFontWidth();
 const GrayscaleBitmap& getVocabularyEntry(char symbol);
 const symbol_map& getVocabulary();
 

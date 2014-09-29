@@ -84,8 +84,7 @@ static void loadDefaultFaceFromFontFile(const std::string& fontPath,
         err << "The font file '" << fontPath << "' could be opened and read, "
             << "but it appears that its font format is unsupported";
         throw std::runtime_error(err.str());
-    }
-    else if (error) {
+    } else if (error) {
         std::stringstream err;
         err << "The font file '" << fontPath << "' either could not "
             << "be opened and read, or it is simply broken";
@@ -129,11 +128,11 @@ void setFontFile(const std::string& filepath) {
     initVocabulary();
 }
 
-uint16_t getFontHeight() {
+uint_fast16_t getFontHeight() {
     return ft.fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF;
 }
 
-uint16_t getFontWidth() {
+uint_fast16_t getFontWidth() {
     return ft.fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF;
 }
 
