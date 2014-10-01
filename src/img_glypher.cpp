@@ -6,60 +6,43 @@
 #include "grayscale_bitmap.h"
 #include "freetype_interface.h"
 #include "sdl_interface.h"
+#include "comparison_thread.h"
 
-uint8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
-                                const GrayscaleBitmap& glyph) {
-    if (imgPart.size() != (int32_t)glyph.rows * glyph.columns) {
-        throw std::runtime_error("Sizes of image part and symbol glyph do not match");
-    }
+typedef std::unique_ptr<SymbolMatches> unique_res_ptr;
 
-    int32_t pixelCount = imgPart.size();
-    int32_t diffAcc = 0;
-
-    for (int32_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
-        diffAcc += abs((int)imgPart.at(pixelNum) - glyph.pixels->at(pixelNum));
-    }
-
-    return diffAcc / pixelCount;
-}
-
-char chooseMatchingSymbol(const FrameSlider& imgPart) {
-    uint8_t minDiff = 0xFF;
-    char bestMatch = ' ';
-
-    symbol_map vocabulary = getVocabulary();
-
-    for (   symbol_map::const_iterator symbolIter = vocabulary.begin();
-            symbolIter != vocabulary.end(); ++symbolIter) {
-        uint8_t diff = calculateGrayLevelDiff(imgPart, symbolIter->second);
-
-        if (diff < minDiff) {
-            bestMatch = symbolIter->first;
-            minDiff = diff;
-        }
-    }
-
-    return bestMatch;
-}
-
+uint_fast8_t const THREAD_CONTRIBUTION = 5;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
     setFontFile(fontPath);
-    const FramedBitmap map = loadGrayscaleImage(imgPath);
+    FramedBitmap map = loadGrayscaleImage(imgPath);
+    map.frameWidth  = getFontWidth();
+    map.frameHeight = getFontHeight();
 
-    FrameSlider lastFrame   = map.lastFrame(getFontWidth(), getFontHeight());
-    FrameSlider frame       = map.firstFrame(getFontWidth(), getFontHeight());
 
-    for (; frame != lastFrame; frame.slide()) {
-        if (frame.newline) {
-            outfile << '\n';
+    size_t framesCount =  (map.columns / map.frameWidth)
+                            * (map.rows / map.frameHeight);
+    uint_fast8_t totalSymbols = LAST_ASCII_SYMBOL - FIRST_ASCII_SYMBOL;
+    uint_fast8_t threadsQuantity = (totalSymbols % THREAD_CONTRIBUTION)
+                                ? totalSymbols / THREAD_CONTRIBUTION + 1
+                                : totalSymbols / THREAD_CONTRIBUTION;
+
+    std::vector<unique_res_ptr> threadResults(threadsQuantity);
+
+    uint_fast8_t assignedSymbols = 0;
+    for (uint_fast8_t threadNum = 0; threadsQuantity < threadsQuantity; ++threadNum) {
+        std::string threadSymbols;
+        for (size_t symbolNum = 0; symbolNum < THREAD_CONTRIBUTION; ++symbolNum) {
+            if (assignedSymbols < totalSymbols) {
+                threadSymbols.push_back(FIRST_ASCII_SYMBOL + assignedSymbols);
+                ++assignedSymbols;
+            }
         }
 
-        outfile << chooseMatchingSymbol(frame);
+        unique_res_ptr uniqueThreadResPtr(new SymbolMatches(framesCount,
+                                                            threadSymbols));
+        threadResults.at(threadNum) = std::move(uniqueThreadResPtr);
     }
-
-    outfile << chooseMatchingSymbol(lastFrame);
 
     outfile.close();
 }

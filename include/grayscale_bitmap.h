@@ -11,6 +11,8 @@ extern "C" {
     #include "SDL.h"
 }
 
+const uint_fast8_t MAX_GRAY_LEVELS = 255;
+
 typedef unsigned char gray_pixel;
 typedef std::vector<gray_pixel> pixels_vector;
 typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
@@ -41,11 +43,14 @@ public:
     FramedBitmap(const FramedBitmap&);
     FramedBitmap(SDL_Surface*);
 
-    FrameSlider       firstFrame(const size_t width, const size_t height) const;
-    const FrameSlider lastFrame( const size_t width, const size_t height) const;
+    FrameSlider       firstFrame()  const;
+    const FrameSlider lastFrame()   const;
 
+    size_t frameWidth;
+    size_t frameHeight;
 private:
     FramedBitmap();
+
 };
 
 class FrameSlider {

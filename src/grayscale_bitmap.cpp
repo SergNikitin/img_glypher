@@ -37,7 +37,6 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     (((fullPixel & pixFormat->color##mask) >> pixFormat->color##shift)  \
         << pixFormat->color##loss)
 
-static const uint_fast8_t MAX_GRAY_LEVELS = 255;
 static inline uint_fast8_t rgbPixelToGrayscale( uint32_t rgbPixel,
                                                 const SDL_PixelFormat* fmt) {
     uint_fast8_t r = COLOR_BYTE(R, rgbPixel, fmt);
@@ -78,20 +77,24 @@ GrayscaleBitmap::GrayscaleBitmap(const GrayscaleBitmap& toCopy)
 GrayscaleBitmap::~GrayscaleBitmap() {}
 
 
-FramedBitmap::FramedBitmap(SDL_Surface* surface) : GrayscaleBitmap(surface) {}
-FramedBitmap::FramedBitmap(const FramedBitmap& map) : GrayscaleBitmap(map) {}
+FramedBitmap::FramedBitmap(SDL_Surface* surface)
+    : GrayscaleBitmap(surface)
+    , frameWidth(1)
+    , frameHeight(1) {}
+FramedBitmap::FramedBitmap(const FramedBitmap& map)
+    : GrayscaleBitmap(map)
+    , frameWidth(1)
+    , frameHeight(1) {}
 
-FrameSlider FramedBitmap::firstFrame(   const size_t width,
-                                        const size_t height) const {
-    return FrameSlider(*this, width, height);
+FrameSlider FramedBitmap::firstFrame() const {
+    return FrameSlider(*this, frameWidth, frameHeight);
 }
 
-const FrameSlider FramedBitmap::lastFrame(  const size_t width,
-                                            const size_t height) const {
-    size_t leftBorderCol    = columns   - columns % width   - width;
-    size_t topBorderRow     = rows      - rows % height     - height;
+const FrameSlider FramedBitmap::lastFrame() const {
+    size_t leftBorderCol    = columns   - columns % frameWidth  - frameWidth;
+    size_t topBorderRow     = rows      - rows % frameHeight    - frameHeight;
 
-    return FrameSlider(*this, width, height, leftBorderCol, topBorderRow);
+    return FrameSlider(*this, frameWidth, frameHeight, leftBorderCol, topBorderRow);
 }
 
 FrameSlider::FrameSlider(const FramedBitmap& _map,

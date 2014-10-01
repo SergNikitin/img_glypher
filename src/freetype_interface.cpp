@@ -59,9 +59,6 @@ static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
 }
 
 static void initVocabulary() {
-    static const char FIRST_ASCII_SYMBOL    = ' ';
-    static const char LAST_ASCII_SYMBOL     = '~';
-
     ft.vocabulary.clear();
 
     for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
