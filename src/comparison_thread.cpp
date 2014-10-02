@@ -3,7 +3,7 @@
 
 SymbolMatches::SymbolMatches(size_t framesQuantity, std::string& _symbolSet)
     : frameWinners(framesQuantity)
-    , progress(0)
+    , progress(new std::atomic_size_t(0))
     , symbolSet(_symbolSet) {}
 
 static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,

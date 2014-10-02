@@ -8,7 +8,7 @@
 #include "sdl_interface.h"
 #include "comparison_thread.h"
 
-typedef std::unique_ptr<SymbolMatches> unique_res_ptr;
+// typedef std::unique_ptr<SymbolMatches> unique_res_ptr;
 
 uint_fast8_t const THREAD_CONTRIBUTION = 5;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
@@ -27,7 +27,7 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
                                 ? totalSymbols / THREAD_CONTRIBUTION + 1
                                 : totalSymbols / THREAD_CONTRIBUTION;
 
-    std::vector<unique_res_ptr> threadResults(threadsQuantity);
+    std::vector<SymbolMatches> threadResults(threadsQuantity);
 
     uint_fast8_t assignedSymbols = 0;
     for (uint_fast8_t threadNum = 0; threadsQuantity < threadsQuantity; ++threadNum) {
@@ -39,9 +39,8 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
             }
         }
 
-        unique_res_ptr uniqueThreadResPtr(new SymbolMatches(framesCount,
-                                                            threadSymbols));
-        threadResults.at(threadNum) = std::move(uniqueThreadResPtr);
+        threadResults.emplace_back(framesCount, threadSymbols);
+        // threadResults.at(threadNum) = SymbolMatches(framesCount, threadSymbols);
     }
 
     outfile.close();
