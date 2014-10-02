@@ -32,7 +32,7 @@ public:
     const uint_fast8_t num_grays;
 
 private:
-    GrayscaleBitmap();
+    GrayscaleBitmap() = delete;
 };
 
 class FramedBitmap;
@@ -49,7 +49,7 @@ public:
     size_t frameWidth;
     size_t frameHeight;
 private:
-    FramedBitmap();
+    FramedBitmap() = delete;
 
 };
 
@@ -78,7 +78,7 @@ private:
     size_t topBorderRow;
 
 
-    FrameSlider();
+    FrameSlider() = delete;
 };
 
 #endif // __GRAYSCALE_BITMAP_H__

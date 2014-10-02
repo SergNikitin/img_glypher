@@ -12,7 +12,7 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
                                     / FIXED_POINT_26_6_COEFF;
     size_t leftBearing         = fontFace->glyph->bitmap_left;
     size_t fromTopToSymbol     = baselineRow - fontFace->glyph->bitmap_top;
-    const FT_Bitmap* ftBitmap   = &fontFace->glyph->bitmap;
+    const FT_Bitmap* ftBitmap  = &fontFace->glyph->bitmap;
     const size_t vectorSize    = pixels->size();
 
     size_t symbolRows = (size_t)ftBitmap->rows;
