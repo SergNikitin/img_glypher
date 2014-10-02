@@ -14,6 +14,8 @@ public:
     SymbolMatches() = delete;
     SymbolMatches(size_t framesQuantity, std::string& _symbolSet);
 
+    SymbolMatches(const SymbolMatches&);
+
     std::vector<frame_winner> frameWinners;
     std::unique_ptr<std::atomic_size_t> progress;
     const std::string symbolSet;

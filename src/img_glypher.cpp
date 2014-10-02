@@ -27,7 +27,8 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
                                 ? totalSymbols / THREAD_CONTRIBUTION + 1
                                 : totalSymbols / THREAD_CONTRIBUTION;
 
-    std::vector<SymbolMatches> threadResults(threadsQuantity);
+    std::vector<SymbolMatches> threadResults;
+    threadResults.reserve(threadsQuantity);
 
     uint_fast8_t assignedSymbols = 0;
     for (uint_fast8_t threadNum = 0; threadsQuantity < threadsQuantity; ++threadNum) {
@@ -40,7 +41,6 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
         }
 
         threadResults.emplace_back(framesCount, threadSymbols);
-        // threadResults.at(threadNum) = SymbolMatches(framesCount, threadSymbols);
     }
 
     outfile.close();
