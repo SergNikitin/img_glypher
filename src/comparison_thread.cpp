@@ -7,11 +7,6 @@ SymbolMatches::SymbolMatches(size_t framesQuantity, std::string& _symbolSet)
     frameWinners.reserve(framesQuantity);
 }
 
-SymbolMatches::SymbolMatches(const SymbolMatches& toCopy)
-    : frameWinners(toCopy.frameWinners)
-    , progress(std::move(progress))
-    , symbolSet(toCopy.symbolSet) {}
-
 static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
                                             const GrayscaleBitmap& glyph) {
     if (imgPart.size() != glyph.rows * glyph.columns) {
