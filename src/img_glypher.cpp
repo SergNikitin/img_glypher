@@ -8,8 +8,6 @@
 #include "sdl_interface.h"
 #include "comparison_thread.h"
 
-// typedef std::unique_ptr<SymbolMatches> unique_res_ptr;
-
 uint_fast8_t const THREAD_CONTRIBUTION = 5;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
