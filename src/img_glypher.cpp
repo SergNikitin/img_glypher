@@ -38,7 +38,7 @@ static char bestFrameMatchAmongThreads(std::vector<SymbolMatches>& results,
     return bestMatch;
 }
 
-uint_fast8_t const THREAD_CONTRIBUTION = 5;
+uint_fast8_t const THREAD_CONTRIBUTION = 20;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
