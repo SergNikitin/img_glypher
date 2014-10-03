@@ -42,13 +42,24 @@ static frame_winner chooseMatchingSymbol(   const FrameSlider& imgPart,
     return frame_winner(bestMatch, minDiff);
 }
 
-void processVocabularyPart(const FramedBitmap& map, SymbolMatches& matches) {
-    FrameSlider lastFrame   = map.lastFrame();
-    FrameSlider frame       = map.firstFrame();
+#include <iostream>
+#include <exception>
 
-    for (; frame != lastFrame; frame.slide()) {
-        frame_winner winner = chooseMatchingSymbol(frame, matches.symbolSet);
-        matches.frameWinners.push_back(winner);
-        ++(*matches.progress);
+void processVocabularyPart( const FramedBitmap* map, SymbolMatches* matches) {
+    try {
+        FrameSlider lastFrame   = map->lastFrame();
+        FrameSlider frame       = map->firstFrame();
+
+        for (; frame != lastFrame; frame.slide()) {
+            frame_winner winner = chooseMatchingSymbol(frame, matches->symbolSet);
+            matches->frameWinners.push_back(winner);
+            ++(*matches->progress);
+        }
+    }
+    catch (std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception caught" << std::endl;
     }
 }

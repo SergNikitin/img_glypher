@@ -19,6 +19,6 @@ public:
     const std::string symbolSet;
 };
 
-void processVocabularyPart(const FramedBitmap&, SymbolMatches&);
+void processVocabularyPart(const FramedBitmap*, SymbolMatches*);
 
 #endif // __COMPARISON_THREAD_H__
