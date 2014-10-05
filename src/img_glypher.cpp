@@ -67,26 +67,24 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     map.setFrameSize(getFontWidth(), getFontHeight());
 
     uint_fast8_t threadsTotal = calcNeededThreads(THREAD_CONTRIBUTION);
-    std::thread threads[threadsTotal];
 
     std::string dummySymbolSet(THREAD_CONTRIBUTION, ' ');
     SymbolMatches dummy(map.countFrames(), dummySymbolSet);
     std::vector<SymbolMatches> threadResults(threadsTotal, dummy);
     assignSymbolTasksForThreads(threadResults);
 
-    for (uint_fast8_t threadNum = 0; threadNum < threadsTotal; ++threadNum) {
-        threads[threadNum] = std::thread(   processVocabularyPart, &map,
-                                            &threadResults.at(threadNum));
-        threads[threadNum].detach();
+    for (SymbolMatches& container : threadResults) {
+        std::thread(processVocabularyPart, &map, &container).detach();
     }
 
     size_t processedFrames = 0;
-
-    while (processedFrames < map.countFrames() - 1) {
+    size_t framesTotal = map.countFrames();
+    size_t framesInRow = map.columns / map.frameWidth;
+    while (processedFrames < framesTotal) {
         if (slowestThreadProgress(threadResults) > processedFrames) {
             outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
 
-            if (processedFrames % (map.columns / map.frameWidth) == 0) {
+            if (processedFrames % framesInRow == 0) {
                 outfile << '\n';
             }
 

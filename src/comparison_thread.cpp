@@ -61,6 +61,11 @@ void processVocabularyPart( const FramedBitmap* map, SymbolMatches* matches) {
             matches->frameWinners.push_back(winner);
             ++matches->progress;
         }
+
+        frame_winner winner = chooseMatchingSymbol(lastFrame, matches->symbolSet);
+        matches->frameWinners.push_back(winner);
+        ++matches->progress;
+
     }
     catch (std::exception& err) {
         std::cerr << err.what() << std::endl;
