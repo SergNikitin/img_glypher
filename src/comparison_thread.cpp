@@ -2,9 +2,15 @@
 #include "freetype_interface.h"
 
 SymbolMatches::SymbolMatches(size_t framesQuantity, std::string& _symbolSet)
-    : progress(new std::atomic_size_t(0))
+    : progress(0)
     , symbolSet(_symbolSet) {
     frameWinners.reserve(framesQuantity);
+}
+
+SymbolMatches::SymbolMatches(const SymbolMatches& toCopy)
+    : frameWinners(toCopy.frameWinners)
+    , progress(toCopy.progress.load())
+    , symbolSet(toCopy.symbolSet) {
 }
 
 static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
@@ -53,7 +59,7 @@ void processVocabularyPart( const FramedBitmap* map, SymbolMatches* matches) {
         for (; frame != lastFrame; frame.slide()) {
             frame_winner winner = chooseMatchingSymbol(frame, matches->symbolSet);
             matches->frameWinners.push_back(winner);
-            ++(*matches->progress);
+            ++matches->progress;
         }
     }
     catch (std::exception& err) {

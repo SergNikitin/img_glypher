@@ -97,6 +97,15 @@ const FrameSlider FramedBitmap::lastFrame() const {
     return FrameSlider(*this, frameWidth, frameHeight, leftBorderCol, topBorderRow);
 }
 
+void FramedBitmap::setFrameSize(size_t width, size_t height) {
+    frameWidth = width;
+    frameHeight = height;
+}
+
+size_t FramedBitmap::countFrames() const {
+    return (columns / frameWidth) * (rows / frameHeight);
+}
+
 FrameSlider::FrameSlider(const FramedBitmap& _map,
                         const size_t _width, const size_t _height,
                         size_t _leftBorderCol, size_t _topBorderRow)

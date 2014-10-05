@@ -10,11 +10,11 @@
 #include "comparison_thread.h"
 
 static size_t slowestThreadProgress(std::vector<SymbolMatches>& results) {
-    size_t slowest = *results.front().progress;
+    size_t slowest = results.front().progress;
 
     for (SymbolMatches& partialResult : results) {
-        if (*partialResult.progress < slowest) {
-            slowest = *partialResult.progress;
+        if (partialResult.progress < slowest) {
+            slowest = partialResult.progress;
         }
     }
 
@@ -38,43 +38,43 @@ static char bestFrameMatchAmongThreads(std::vector<SymbolMatches>& results,
     return bestMatch;
 }
 
+static inline uint_fast8_t calcNeededThreads(uint_fast8_t threadContribution) {
+    uint_fast8_t symbolsTotal = LAST_ASCII_SYMBOL - FIRST_ASCII_SYMBOL;
+    uint_fast8_t threadsTotal = (symbolsTotal % threadContribution != 0)
+                                ? symbolsTotal / threadContribution + 1
+                                : symbolsTotal / threadContribution;
+
+    return threadsTotal;
+}
+
+static void assignSymbolTasksForThreads(std::vector<SymbolMatches>& res) {
+    char symbolTask = FIRST_ASCII_SYMBOL;
+
+    for (SymbolMatches& singleThreadRes : res) {
+        for (char& symbol : singleThreadRes.symbolSet) {
+            symbol = symbolTask <= LAST_ASCII_SYMBOL
+                    ? symbolTask++ : LAST_ASCII_SYMBOL;
+        }
+    }
+}
+
 uint_fast8_t const THREAD_CONTRIBUTION = 20;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
     setFontFile(fontPath);
     FramedBitmap map = loadGrayscaleImage(imgPath);
-    map.frameWidth  = getFontWidth();
-    map.frameHeight = getFontHeight();
+    map.setFrameSize(getFontWidth(), getFontHeight());
 
+    uint_fast8_t threadsTotal = calcNeededThreads(THREAD_CONTRIBUTION);
+    std::thread threads[threadsTotal];
 
-    size_t framesInRow = map.columns / map.frameWidth;
-    size_t framesCount =  framesInRow * (map.rows / map.frameHeight);
-    uint_fast8_t totalSymbols = LAST_ASCII_SYMBOL - FIRST_ASCII_SYMBOL;
-    uint_fast8_t threadsQuantity = (totalSymbols % THREAD_CONTRIBUTION)
-                                ? totalSymbols / THREAD_CONTRIBUTION + 1
-                                : totalSymbols / THREAD_CONTRIBUTION;
+    std::string dummySymbolSet(THREAD_CONTRIBUTION, ' ');
+    SymbolMatches dummy(map.countFrames(), dummySymbolSet);
+    std::vector<SymbolMatches> threadResults(threadsTotal, dummy);
+    assignSymbolTasksForThreads(threadResults);
 
-    std::vector<SymbolMatches> threadResults;
-    threadResults.reserve(threadsQuantity);
-
-
-    uint_fast8_t assignedSymbols = 0;
-    for (uint_fast8_t threadNum = 0; threadNum < threadsQuantity; ++threadNum) {
-        std::string threadSymbols;
-        for (size_t symbolNum = 0; symbolNum < THREAD_CONTRIBUTION; ++symbolNum) {
-            if (assignedSymbols < totalSymbols) {
-                threadSymbols.push_back(FIRST_ASCII_SYMBOL + assignedSymbols);
-                ++assignedSymbols;
-            }
-        }
-
-        threadResults.emplace_back(framesCount, threadSymbols);
-    }
-
-    std::thread threads[threadsQuantity];
-
-    for (uint_fast8_t threadNum = 0; threadNum < threadsQuantity; ++threadNum) {
+    for (uint_fast8_t threadNum = 0; threadNum < threadsTotal; ++threadNum) {
         threads[threadNum] = std::thread(   processVocabularyPart, &map,
                                             &threadResults.at(threadNum));
         threads[threadNum].detach();
@@ -82,11 +82,11 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
 
     size_t processedFrames = 0;
 
-    while (processedFrames < framesCount - 1) {
+    while (processedFrames < map.countFrames() - 1) {
         if (slowestThreadProgress(threadResults) > processedFrames) {
             outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
 
-            if (processedFrames % framesInRow == 0) {
+            if (processedFrames % (map.columns / map.frameWidth) == 0) {
                 outfile << '\n';
             }
 

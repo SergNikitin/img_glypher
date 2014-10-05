@@ -12,11 +12,12 @@ typedef std::pair<char, uint_fast8_t> frame_winner;
 class SymbolMatches {
 public:
     SymbolMatches() = delete;
-    SymbolMatches(size_t framesQuantity, std::string& _symbolSet);
+    SymbolMatches(size_t framesQuantity, std::string& symbolSet);
+    SymbolMatches(const SymbolMatches&);
 
     std::vector<frame_winner> frameWinners;
-    std::unique_ptr<std::atomic_size_t> progress;
-    const std::string symbolSet;
+    std::atomic_size_t progress;
+    std::string symbolSet;
 };
 
 void processVocabularyPart(const FramedBitmap*, SymbolMatches*);
