@@ -62,7 +62,7 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
             size_t pixelNum = row * columns + col;
             uint8_t* pixelDataStart = static_cast<uint8_t*>(surface->pixels)
                                         + pixelNum * bytesPerPixel;
-            uint32_t rgbPixel = *static_cast<uint32_t*>(pixelDataStart);
+            uint32_t rgbPixel = *reinterpret_cast<uint32_t*>(pixelDataStart);
 
             uint_fast8_t grayLevel = rgbPixelToGrayscale(rgbPixel, surface->format);
             pixels->at(pixelNum) = grayLevel;
