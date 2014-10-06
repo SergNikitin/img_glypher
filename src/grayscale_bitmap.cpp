@@ -51,7 +51,8 @@ static inline uint_fast8_t rgbPixelToGrayscale( uint32_t rgbPixel,
 }
 
 GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
-    : rows(surface->h), columns(surface->w)
+    : rows(surface->h)
+    , columns(surface->w)
     , pixels(new pixels_vector(surface->h * surface->w, 0))
     , num_grays(MAX_GRAY_LEVELS) {
 
@@ -70,7 +71,8 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
 }
 
 GrayscaleBitmap::GrayscaleBitmap(const GrayscaleBitmap& toCopy)
-    : rows(toCopy.rows), columns(toCopy.columns)
+    : rows(toCopy.rows)
+    , columns(toCopy.columns)
     , pixels(new pixels_vector(toCopy.pixels->begin(), toCopy.pixels->end()))
     , num_grays(toCopy.num_grays) {}
 
