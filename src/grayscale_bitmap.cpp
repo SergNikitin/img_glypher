@@ -15,8 +15,8 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     const FT_Bitmap& ftBitmap  = fontFace->glyph->bitmap;
     const size_t vectorSize    = pixels->size();
 
-    size_t symbolRows = (size_t)ftBitmap.rows;
-    size_t symbolCols = (size_t)ftBitmap.width;
+    size_t symbolRows = static_cast<size_t>(ftBitmap.rows);
+    size_t symbolCols = static_cast<size_t>(ftBitmap.width);
 
     for (size_t symbolRow = 0; symbolRow < symbolRows; ++symbolRow) {
         for (size_t symbolCol = 0; symbolCol < symbolCols; ++symbolCol) {
@@ -43,9 +43,9 @@ static inline uint_fast8_t rgbPixelToGrayscale( uint32_t rgbPixel,
     uint_fast8_t g = COLOR_BYTE(G, rgbPixel, fmt);
     uint_fast8_t b = COLOR_BYTE(B, rgbPixel, fmt);
 
-    uint_fast8_t grayLevel =   0.212671f * r
-                        + 0.715160f * g
-                        + 0.072169f * b;
+    uint_fast8_t grayLevel =      0.212671f * r
+                                + 0.715160f * g
+                                + 0.072169f * b;
 
     return MAX_GRAY_LEVELS - grayLevel;
 }
@@ -60,9 +60,9 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
     for (size_t row = 0; row < rows; ++row) {
         for (size_t col = 0; col < columns; ++col) {
             size_t pixelNum = row * columns + col;
-            uint8_t* pixelDataStart = (uint8_t*)surface->pixels
-                                                + pixelNum * bytesPerPixel;
-            uint32_t rgbPixel = *(uint32_t*)pixelDataStart;
+            uint8_t* pixelDataStart = static_cast<uint8_t*>(surface->pixels)
+                                        + pixelNum * bytesPerPixel;
+            uint32_t rgbPixel = *static_cast<uint32_t*>(pixelDataStart);
 
             uint_fast8_t grayLevel = rgbPixelToGrayscale(rgbPixel, surface->format);
             pixels->at(pixelNum) = grayLevel;

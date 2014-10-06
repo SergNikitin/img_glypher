@@ -23,7 +23,8 @@ static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
     size_t diffAcc = 0;
 
     for (size_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
-        diffAcc += abs((int)imgPart.at(pixelNum) - glyph.pixels->at(pixelNum));
+        diffAcc += abs(static_cast<int>(imgPart.at(pixelNum))
+                        - glyph.pixels->at(pixelNum));
     }
 
     return diffAcc / pixelCount;
