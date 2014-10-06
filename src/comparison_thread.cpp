@@ -1,7 +1,7 @@
 #include "comparison_thread.h"
 #include "freetype_interface.h"
 
-SymbolMatches::SymbolMatches(size_t framesQuantity, std::string& _symbolSet)
+SymbolMatches::SymbolMatches(size_t framesQuantity, const std::string& _symbolSet)
     : progress(0)
     , symbolSet(_symbolSet) {
     frameWinners.reserve(framesQuantity);

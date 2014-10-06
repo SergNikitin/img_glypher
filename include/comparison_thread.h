@@ -12,7 +12,7 @@ typedef std::pair<char, uint_fast8_t> frame_winner;
 class SymbolMatches {
 public:
     SymbolMatches() = delete;
-    SymbolMatches(size_t framesQuantity, std::string& symbolSet);
+    SymbolMatches(size_t framesQuantity, const std::string& symbolSet);
     SymbolMatches(const SymbolMatches&);
 
     std::vector<frame_winner> frameWinners;
