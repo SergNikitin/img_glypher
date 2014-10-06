@@ -61,7 +61,8 @@ static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
 static void initVocabulary() {
     ft.vocabulary.clear();
 
-    for (char symbol = FIRST_ASCII_SYMBOL; symbol <= LAST_ASCII_SYMBOL; ++symbol) {
+    for (char   symbol = FIRST_PRINTABLE_ASCII_SYMBOL;
+                symbol <= LAST_PRINTABLE_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap bitmap = asciiSymbolToBitmap(symbol);
         std::pair<char, GrayscaleBitmap> entry(symbol, bitmap);
         ft.vocabulary.insert(entry);

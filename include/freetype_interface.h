@@ -12,8 +12,8 @@ uint_fast16_t getFontWidth();
 const GrayscaleBitmap& getVocabularyEntry(char symbol);
 const symbol_map& getVocabulary();
 
-const char FIRST_ASCII_SYMBOL = ' ';
-const char LAST_ASCII_SYMBOL  = '~';
+const char FIRST_PRINTABLE_ASCII_SYMBOL = ' ';
+const char LAST_PRINTABLE_ASCII_SYMBOL  = '~';
 
 
 #endif // __FREETYPE_INTERFACE_H__

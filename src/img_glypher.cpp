@@ -39,7 +39,8 @@ static char bestFrameMatchAmongThreads(std::vector<SymbolMatches>& results,
 }
 
 static inline uint_fast8_t calcNeededThreads(uint_fast8_t threadContribution) {
-    uint_fast8_t symbolsTotal = LAST_ASCII_SYMBOL - FIRST_ASCII_SYMBOL;
+    uint_fast8_t symbolsTotal = LAST_PRINTABLE_ASCII_SYMBOL
+                                - FIRST_PRINTABLE_ASCII_SYMBOL;
     uint_fast8_t threadsTotal = (symbolsTotal % threadContribution != 0)
                                 ? symbolsTotal / threadContribution + 1
                                 : symbolsTotal / threadContribution;
@@ -48,12 +49,12 @@ static inline uint_fast8_t calcNeededThreads(uint_fast8_t threadContribution) {
 }
 
 static void assignSymbolTasksForThreads(std::vector<SymbolMatches>& res) {
-    char symbolTask = FIRST_ASCII_SYMBOL;
+    char symbolTask = FIRST_PRINTABLE_ASCII_SYMBOL;
 
     for (SymbolMatches& singleThreadRes : res) {
         for (char& symbol : singleThreadRes.symbolSet) {
-            symbol = symbolTask <= LAST_ASCII_SYMBOL
-                    ? symbolTask++ : LAST_ASCII_SYMBOL;
+            symbol = symbolTask <= LAST_PRINTABLE_ASCII_SYMBOL
+                    ? symbolTask++ : LAST_PRINTABLE_ASCII_SYMBOL;
         }
     }
 }
