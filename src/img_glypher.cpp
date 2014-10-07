@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <algorithm>
 #include <exception>
 #include <thread>
 
@@ -8,18 +9,6 @@
 #include "freetype_interface.h"
 #include "sdl_interface.h"
 #include "comparison_thread.h"
-
-static size_t slowestThreadProgress(std::vector<SymbolMatches>& results) {
-    size_t slowest = results.front().progress;
-
-    for (SymbolMatches& partialResult : results) {
-        if (partialResult.progress < slowest) {
-            slowest = partialResult.progress;
-        }
-    }
-
-    return slowest;
-}
 
 static char bestFrameMatchAmongThreads(const std::vector<SymbolMatches>& results,
                                         size_t frame) {
@@ -81,8 +70,14 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     size_t processedFrames = 0;
     size_t framesTotal = map.countFrames();
     size_t framesInRow = map.columns / map.frameWidth;
+    auto slowestThreadLamda = [](SymbolMatches& lhs, SymbolMatches& rhs) {
+        return lhs.progress.load() < rhs.progress.load();
+    };
     while (processedFrames < framesTotal) {
-        if (slowestThreadProgress(threadResults) > processedFrames) {
+        auto slowest = std::min_element(threadResults.begin(), threadResults.end(),
+                                        slowestThreadLamda);
+
+        if (slowest->progress.load() > processedFrames) {
             outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
 
             if (processedFrames % framesInRow == 0) {
