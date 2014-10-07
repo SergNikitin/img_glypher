@@ -1,9 +1,14 @@
 #include "comparison_thread.h"
 #include "freetype_interface.h"
 
-SymbolMatches::SymbolMatches(size_t framesQuantity, const std::string& _symbolSet)
+FrameWinner::FrameWinner(char symb, uint_fast8_t diff)
+    : symbol(symb)
+    , grayLvlDiff(diff) {
+}
+
+SymbolMatches::SymbolMatches(size_t framesQuantity, const std::string& set)
     : progress(0)
-    , symbolSet(_symbolSet) {
+    , symbolSet(set) {
     frameWinners.reserve(framesQuantity);
 }
 
@@ -30,8 +35,8 @@ static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
     return diffAcc / pixelCount;
 }
 
-static frame_winner chooseMatchingSymbol(   const FrameSlider& imgPart,
-                                            const std::string& symbolSet) {
+static FrameWinner chooseMatchingSymbol(const FrameSlider& imgPart,
+                                        const std::string& symbolSet) {
     uint_fast8_t minDiff = 0xFF;
     char bestMatch = symbolSet.front();
 
@@ -46,24 +51,24 @@ static frame_winner chooseMatchingSymbol(   const FrameSlider& imgPart,
         }
     }
 
-    return frame_winner(bestMatch, minDiff);
+    return FrameWinner(bestMatch, minDiff);
 }
 
 #include <iostream>
 #include <exception>
 
-void processVocabularyPart( const FramedBitmap* map, SymbolMatches* matches) {
+void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
     try {
-        FrameSlider lastFrame   = map->lastFrame();
-        FrameSlider frame       = map->firstFrame();
+        const FrameSlider lastFrame = map->lastFrame();
+        FrameSlider       frame     = map->firstFrame();
 
         for (; frame != lastFrame; frame.slide()) {
-            frame_winner winner = chooseMatchingSymbol(frame, matches->symbolSet);
+            FrameWinner winner = chooseMatchingSymbol(frame, matches->symbolSet);
             matches->frameWinners.push_back(winner);
             ++matches->progress;
         }
 
-        frame_winner winner = chooseMatchingSymbol(lastFrame, matches->symbolSet);
+        FrameWinner winner = chooseMatchingSymbol(lastFrame, matches->symbolSet);
         matches->frameWinners.push_back(winner);
         ++matches->progress;
 

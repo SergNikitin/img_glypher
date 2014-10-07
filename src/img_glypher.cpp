@@ -21,16 +21,16 @@ static size_t slowestThreadProgress(std::vector<SymbolMatches>& results) {
     return slowest;
 }
 
-static char bestFrameMatchAmongThreads(std::vector<SymbolMatches>& results,
+static char bestFrameMatchAmongThreads(const std::vector<SymbolMatches>& results,
                                         size_t frame) {
-    char bestMatch          = results.front().frameWinners.at(frame).first;
-    uint_fast8_t minDiff    = results.front().frameWinners.at(frame).second;
+    char bestMatch          = results.front().frameWinners.at(frame).symbol;
+    uint_fast8_t minDiff    = results.front().frameWinners.at(frame).grayLvlDiff;
 
-    for (SymbolMatches& partialResult : results) {
-        uint_fast8_t diff = partialResult.frameWinners.at(frame).second;
+    for (const SymbolMatches& partialResult : results) {
+        uint_fast8_t diff = partialResult.frameWinners.at(frame).grayLvlDiff;
 
         if (diff < minDiff) {
-            bestMatch = partialResult.frameWinners.at(frame).first;
+            bestMatch = partialResult.frameWinners.at(frame).symbol;
             minDiff = diff;
         }
     }
@@ -92,8 +92,6 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
             ++processedFrames;
         }
     }
-
-    outfile.close();
 }
 
 int main(int argc, char* argv[]) {
