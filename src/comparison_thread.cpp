@@ -60,9 +60,8 @@ static FrameWinner chooseMatchingSymbol(const FrameSlider& imgPart,
 void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
     try {
         const FrameSlider lastFrame = map->lastFrame();
-        FrameSlider       frame     = map->firstFrame();
 
-        for (; frame != lastFrame; frame.slide()) {
+        for (FrameSlider frame = map->firstFrame(); frame != lastFrame; frame.slide()) {
             FrameWinner winner = chooseMatchingSymbol(frame, matches->symbolSet);
             matches->frameWinners.push_back(winner);
             ++matches->progress;
