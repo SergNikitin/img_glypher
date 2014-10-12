@@ -73,7 +73,7 @@ GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
 GrayscaleBitmap::GrayscaleBitmap(const GrayscaleBitmap& toCopy)
     : rows(toCopy.rows)
     , columns(toCopy.columns)
-    , pixels(new pixels_vector(toCopy.pixels->begin(), toCopy.pixels->end()))
+    , pixels(new pixels_vector(*toCopy.pixels))
     , num_grays(toCopy.num_grays) {}
 
 GrayscaleBitmap::~GrayscaleBitmap() {}
