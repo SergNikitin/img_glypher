@@ -72,8 +72,6 @@ public:
     bool operator==(const FrameSlider&) const;
     bool operator!=(const FrameSlider&) const;
 
-    bool newline;
-
 private:
     const FramedBitmap* map;
     const size_t width;

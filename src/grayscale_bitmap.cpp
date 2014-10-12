@@ -111,8 +111,11 @@ size_t FramedBitmap::countFrames() const {
 FrameSlider::FrameSlider(const FramedBitmap& _map,
                         const size_t _width, const size_t _height,
                         size_t _leftBorderCol, size_t _topBorderRow)
-    : newline(false), map(&_map), width(_width), height(_height)
-    , leftBorderCol(_leftBorderCol), topBorderRow(_topBorderRow) {
+    : map(&_map)
+    , width(_width)
+    , height(_height)
+    , leftBorderCol(_leftBorderCol)
+    , topBorderRow(_topBorderRow) {
 
     if (    leftBorderCol + width > map->columns
         ||  topBorderRow + height > map->rows) {
@@ -129,11 +132,9 @@ void FrameSlider::slide() {
     size_t rowPosOfFrameBelow    = topBorderRow  + height;
 
     if (colPosOfFrameToRight + width <= map->columns) {
-        newline = false;
         newLeftBorder = colPosOfFrameToRight;
         newTopBorder = topBorderRow;
     } else if (rowPosOfFrameBelow + height <= map->rows) {
-        newline = true;
         newLeftBorder = 0;
         newTopBorder = rowPosOfFrameBelow;
     } else {
