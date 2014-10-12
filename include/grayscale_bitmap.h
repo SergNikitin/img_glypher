@@ -19,8 +19,6 @@ typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
 
 class GrayscaleBitmap {
 public:
-    GrayscaleBitmap() = delete;
-
     explicit GrayscaleBitmap(const FT_Face);
     explicit GrayscaleBitmap(SDL_Surface*);
 
@@ -39,8 +37,6 @@ class FrameSlider;
 
 class FramedBitmap : public GrayscaleBitmap {
 public:
-    FramedBitmap() = delete;
-
     explicit FramedBitmap(SDL_Surface*);
     FramedBitmap(const FramedBitmap&);
 
@@ -57,8 +53,6 @@ private:
 
 class FrameSlider {
 public:
-    FrameSlider() = delete;
-
     FrameSlider(const FramedBitmap& _map,
                 const size_t _width, const size_t _height,
                 size_t _leftBorderCol = 0, size_t _topBorderRow = 0);

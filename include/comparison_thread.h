@@ -9,7 +9,6 @@
 
 class FrameWinner {
 public:
-    FrameWinner() = delete;
     FrameWinner(char, uint_fast8_t);
 
     char symbol;
@@ -18,7 +17,6 @@ public:
 
 class SymbolMatches {
 public:
-    SymbolMatches() = delete;
     SymbolMatches(size_t framesQuantity, const std::string& symbolSet);
     SymbolMatches(const SymbolMatches&);
 
