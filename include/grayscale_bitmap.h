@@ -41,8 +41,8 @@ class FramedBitmap : public GrayscaleBitmap {
 public:
     FramedBitmap() = delete;
 
+    explicit FramedBitmap(SDL_Surface*);
     FramedBitmap(const FramedBitmap&);
-    FramedBitmap(SDL_Surface*);
 
     FrameSlider       firstFrame()  const;
     const FrameSlider lastFrame()   const;
