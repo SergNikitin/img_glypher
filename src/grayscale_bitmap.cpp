@@ -83,10 +83,10 @@ FramedBitmap::FramedBitmap(SDL_Surface* surface)
     : GrayscaleBitmap(surface)
     , frameWidth(1)
     , frameHeight(1) {}
-FramedBitmap::FramedBitmap(const FramedBitmap& map)
-    : GrayscaleBitmap(map)
-    , frameWidth(1)
-    , frameHeight(1) {}
+FramedBitmap::FramedBitmap(const FramedBitmap& toCopy)
+    : GrayscaleBitmap(toCopy)
+    , frameWidth(toCopy.frameWidth)
+    , frameHeight(toCopy.frameHeight) {}
 
 FrameSlider FramedBitmap::firstFrame() const {
     return FrameSlider(*this, frameWidth, frameHeight);
