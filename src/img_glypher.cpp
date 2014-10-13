@@ -48,6 +48,18 @@ static void assignSymbolTasksForThreads(std::vector<SymbolMatches>& res) {
     }
 }
 
+size_t slowestThreadProgress(const std::vector<SymbolMatches>& results) {
+    size_t slowestThProgress = results.front().progress.load();
+    for (const SymbolMatches& result : results) {
+        size_t progress = result.progress.load();
+        if (progress < slowestThProgress) {
+            slowestThProgress = progress;
+        }
+    }
+
+    return slowestThProgress;
+}
+
 uint_fast8_t const THREAD_CONTRIBUTION = 20;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
@@ -70,14 +82,17 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     size_t processedFrames = 0;
     size_t framesTotal = map.countFrames();
     size_t framesInRow = map.columns / map.frameWidth;
-    auto slowestThreadLamda = [](SymbolMatches& lhs, SymbolMatches& rhs) {
-        return lhs.progress.load() < rhs.progress.load();
-    };
-    while (processedFrames < framesTotal) {
-        auto slowest = std::min_element(threadResults.begin(), threadResults.end(),
-                                        slowestThreadLamda);
+    // auto slowestThreadLamda = [](const SymbolMatches& lhs,
+                                // const SymbolMatches& rhs) {
+        // return lhs.progress.load() < rhs.progress.load();
+    // };
 
-        if (slowest->progress.load() > processedFrames) {
+    while (processedFrames < framesTotal) {
+        // auto slowest = std::min_element(threadResults.begin(), threadResults.end(),
+                                        // slowestThreadLamda);
+
+        // if (slowest->progress.load() > processedFrames) {
+        if (slowestThreadProgress(threadResults) > processedFrames) {
             outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
 
             if (processedFrames % framesInRow == 0) {
@@ -85,6 +100,7 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
             }
 
             ++processedFrames;
+
         }
     }
 }
@@ -107,6 +123,7 @@ int main(int argc, char* argv[]) {
     catch (...) {
         std::cerr << "Unknown exception caught" << std::endl;
     }
+
 
     return 0;
 }
