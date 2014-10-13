@@ -1,3 +1,6 @@
+#include <iostream>
+#include <exception>
+
 #include "comparison_thread.h"
 #include "freetype_interface.h"
 
@@ -54,9 +57,6 @@ static FrameWinner chooseMatchingSymbol(const FrameSlider& imgPart,
     return FrameWinner(bestMatch, minDiff);
 }
 
-#include <iostream>
-#include <exception>
-
 void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
     try {
         const FrameSlider lastFrame = map->lastFrame();
@@ -70,7 +70,6 @@ void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
         FrameWinner winner = chooseMatchingSymbol(lastFrame, matches->symbolSet);
         matches->frameWinners.push_back(winner);
         ++matches->progress;
-
     }
     catch (std::exception& err) {
         std::cerr << err.what() << std::endl;
