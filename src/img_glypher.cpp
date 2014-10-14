@@ -82,16 +82,8 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     size_t processedFrames = 0;
     size_t framesTotal = map.countFrames();
     size_t framesInRow = map.columns / map.frameWidth;
-    // auto slowestThreadLamda = [](const SymbolMatches& lhs,
-                                // const SymbolMatches& rhs) {
-        // return lhs.progress.load() < rhs.progress.load();
-    // };
 
     while (processedFrames < framesTotal) {
-        // auto slowest = std::min_element(threadResults.begin(), threadResults.end(),
-                                        // slowestThreadLamda);
-
-        // if (slowest->progress.load() > processedFrames) {
         if (slowestThreadProgress(threadResults) > processedFrames) {
             outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
 
