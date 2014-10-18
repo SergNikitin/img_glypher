@@ -4,7 +4,7 @@ include(ExternalProject)
 project(freetype_test)
 
 # Build setup
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 set(MAIN_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(MAIN_INCLUDES_DIR ${PROJECT_SOURCE_DIR}/include)
 
