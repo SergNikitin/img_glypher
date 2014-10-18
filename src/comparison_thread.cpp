@@ -28,10 +28,10 @@ static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
     }
 
     size_t pixelCount = imgPart.size();
-    size_t diffAcc = 0;
+    uint64_t diffAcc = 0;
 
     for (size_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
-        diffAcc += abs(static_cast<int>(imgPart.at(pixelNum))
+        diffAcc += abs(static_cast<uint64_t>(imgPart.at(pixelNum))
                         - glyph.pixels->at(pixelNum));
     }
 
@@ -40,7 +40,7 @@ static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
 
 static FrameWinner chooseMatchingSymbol(const FrameSlider& imgPart,
                                         const std::string& symbolSet) {
-    uint_fast8_t minDiff = 0xFF;
+    uint_fast8_t minDiff = MAX_GRAY_LEVELS;
     char bestMatch = symbolSet.front();
 
     symbol_map vocabulary = getVocabulary();
