@@ -5,7 +5,7 @@ static const uint32_t FIXED_POINT_26_6_COEFF = 1<<6;
 GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
     : rows(fontFace->size->metrics.height / FIXED_POINT_26_6_COEFF)
     , columns(fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF)
-    , pixels(new pixels_vector(rows*columns, 0))
+    , pixels(new pixels_vector(rows*columns, MAX_GRAY_LEVELS))
     , num_grays(fontFace->glyph->bitmap.num_grays) {
 
     size_t baselineRow         = fontFace->size->metrics.ascender
@@ -27,7 +27,8 @@ GrayscaleBitmap::GrayscaleBitmap(const FT_Face fontFace)
             // to not crash on symbols that are bigger then their box borders
             if (vectorPos < vectorSize) {
                 size_t bufferPos = symbolRow*ftBitmap.width + symbolCol;
-                pixels->at(vectorPos) = ftBitmap.buffer[bufferPos];
+                pixels->at(vectorPos) = MAX_GRAY_LEVELS
+                                        - ftBitmap.buffer[bufferPos];
             }
         }
     }
@@ -47,7 +48,7 @@ static inline uint_fast8_t rgbPixelToGrayscale( uint32_t rgbPixel,
                                 + 0.715160f * g
                                 + 0.072169f * b;
 
-    return MAX_GRAY_LEVELS - grayLevel;
+    return grayLevel;
 }
 
 GrayscaleBitmap::GrayscaleBitmap(SDL_Surface* surface)
