@@ -19,7 +19,7 @@ public:
         }
     };
 
-    virtual ~FreetypeMaintainer() {
+    ~FreetypeMaintainer() {
         if (fontFace != nullptr) {
             FT_Done_Face(fontFace);
         }

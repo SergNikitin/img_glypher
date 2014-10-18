@@ -24,7 +24,7 @@ public:
         }
     };
 
-    virtual ~SdlMaintainer() {
+    ~SdlMaintainer() {
         IMG_Quit();
         SDL_Quit();
     }
