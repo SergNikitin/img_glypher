@@ -4,11 +4,6 @@
 #include "comparison_thread.h"
 #include "freetype_interface.h"
 
-FrameWinner::FrameWinner(char symb, uint_fast8_t diff)
-    : symbol(symb)
-    , grayLvlDiff(diff) {
-}
-
 SymbolMatches::SymbolMatches(size_t framesQuantity, const std::string& set)
     : progress(0)
     , symbolSet(set) {
@@ -21,40 +16,52 @@ SymbolMatches::SymbolMatches(const SymbolMatches& toCopy)
     , symbolSet(toCopy.symbolSet) {
 }
 
-static uint_fast8_t calculateGrayLevelDiff( const FrameSlider& imgPart,
-                                            const GrayscaleBitmap& glyph) {
-    if (imgPart.size() != glyph.rows * glyph.columns) {
-        throw std::runtime_error("Sizes of image part and symbol glyph do not match");
+static gray_pixel averageFrameBrightness(const FrameSlider& imgPart) {
+    uint64_t acc = 0;
+    size_t frameSize = imgPart.size();
+    for (size_t pixelNum = 0; pixelNum < frameSize; ++pixelNum) {
+        acc += imgPart.at(pixelNum);
     }
 
-    size_t pixelCount = imgPart.size();
-    uint64_t diffAcc = 0;
-
-    for (size_t pixelNum = 0; pixelNum < pixelCount; ++pixelNum) {
-        diffAcc += abs(static_cast<uint64_t>(imgPart.at(pixelNum))
-                        - glyph.pixels->at(pixelNum));
-    }
-
-    return diffAcc / pixelCount;
+    return acc / frameSize;
 }
 
-static FrameWinner chooseMatchingSymbol(const FrameSlider& imgPart,
-                                        const std::string& symbolSet) {
-    uint_fast8_t minDiff = MAX_GRAY_LEVELS;
-    char bestMatch = symbolSet.front();
+static char bestBrightnessMatch(gray_pixel frameBrightness) {
+    brihgtness_map brightnessMap = getBrightnessMap();
 
-    symbol_map vocabulary = getVocabulary();
+    gray_pixel leastBrightnessDiff = MAX_GRAY_LEVELS;
+    char bestMatch = brightnessMap.begin()->first;
 
-    for (char symbol : symbolSet) {
-        uint_fast8_t diff = calculateGrayLevelDiff(imgPart, vocabulary.at(symbol));
-
-        if (diff < minDiff) {
-            bestMatch = symbol;
-            minDiff = diff;
+    for (auto& entry : brightnessMap) {
+        gray_pixel brightnessDiff = abs(static_cast<int>(frameBrightness)
+                                        - entry.second);
+        if (brightnessDiff < leastBrightnessDiff) {
+            leastBrightnessDiff = brightnessDiff;
+            bestMatch = entry.first;
         }
     }
 
-    return FrameWinner(bestMatch, minDiff);
+    return bestMatch;
+}
+
+static char chooseMatchingSymbol(const FrameSlider& imgPart) {
+    // uint_fast8_t minDiff = MAX_GRAY_LEVELS;
+
+
+    // for (char symbol : symbolSet) {
+        // uint_fast8_t diff = calculateGrayLevelDiff(imgPart, vocabulary.at(symbol));
+//
+        // if (diff < minDiff) {
+            // bestMatch = symbol;
+            // minDiff = diff;
+        // }
+    // }
+
+    gray_pixel frameBrightness = averageFrameBrightness(imgPart);
+
+    // std::cout << (int)frameBrightness << std::endl;
+    // return FrameWinner(bestMatch, minDiff);
+    return bestBrightnessMatch(frameBrightness);
 }
 
 void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
@@ -62,13 +69,13 @@ void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
         const FrameSlider lastFrame = map->lastFrame();
 
         for (FrameSlider frame = map->firstFrame(); frame != lastFrame; frame.slide()) {
-            FrameWinner winner = chooseMatchingSymbol(frame, matches->symbolSet);
-            matches->frameWinners.push_back(winner);
+            char match = chooseMatchingSymbol(frame);
+            matches->frameWinners.push_back(match);
             ++matches->progress;
         }
 
-        FrameWinner winner = chooseMatchingSymbol(lastFrame, matches->symbolSet);
-        matches->frameWinners.push_back(winner);
+        gray_pixel match = chooseMatchingSymbol(lastFrame);
+        matches->frameWinners.push_back(match);
         ++matches->progress;
     }
     catch (std::exception& err) {

@@ -29,11 +29,20 @@ public:
 
     FT_Library library;
     FT_Face fontFace;
-    symbol_map vocabulary;
+    brihgtness_map vocabulary;
 
 private:
     FreetypeMaintainer(const FreetypeMaintainer&);
 } ft;
+
+static gray_pixel averageSymbolBrightness(const GrayscaleBitmap& bitmap) {
+    uint64_t acc = 0;
+    for (gray_pixel brightness : *bitmap.pixels) {
+        acc += brightness;
+    }
+
+    return acc / bitmap.pixels->size();
+}
 
 static void checkGlyphFormat(const FT_GlyphSlot& glyph) {
     if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
@@ -58,15 +67,41 @@ static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
     return GrayscaleBitmap(ft.fontFace);
 }
 
+static void expandBrightnessToFullRange(brihgtness_map& brMap) {
+    gray_pixel maxBrightness = brMap.begin()->second;
+    gray_pixel minBrightness = brMap.begin()->second;
+    for (auto& entry : brMap) {
+        if (entry.second > maxBrightness) {
+            maxBrightness = entry.second;
+        }
+
+        if (entry.second < minBrightness) {
+            minBrightness = entry.second;
+        }
+
+    }
+
+    for (auto& entry : brMap) {
+        uint16_t correctedBrightness = entry.second - minBrightness;
+        correctedBrightness *= MAX_GRAY_LEVELS;
+        correctedBrightness /= (maxBrightness - minBrightness);
+        entry.second = correctedBrightness;
+    }
+}
+
 static void initVocabulary() {
     ft.vocabulary.clear();
 
     for (char   symbol = FIRST_PRINTABLE_ASCII_SYMBOL;
                 symbol <= LAST_PRINTABLE_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap bitmap = asciiSymbolToBitmap(symbol);
-        std::pair<char, GrayscaleBitmap> entry(symbol, bitmap);
+        gray_pixel brightness = MAX_GRAY_LEVELS - averageSymbolBrightness(bitmap);
+        // gray_pixel brightness = averageSymbolBrightness(bitmap);
+        symbol_brightness entry(symbol, brightness);
         ft.vocabulary.insert(entry);
     }
+
+    expandBrightnessToFullRange(ft.vocabulary);
 }
 
 static void loadDefaultFaceFromFontFile(const std::string& fontPath,
@@ -134,10 +169,10 @@ uint_fast16_t getFontWidth() {
     return ft.fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF;
 }
 
-const GrayscaleBitmap& getVocabularyEntry(char symbol) {
+gray_pixel getSymbolBrightness(char symbol) {
     return ft.vocabulary.at(symbol);
 }
 
-const symbol_map& getVocabulary() {
+const brihgtness_map& getBrightnessMap() {
     return ft.vocabulary;
 }

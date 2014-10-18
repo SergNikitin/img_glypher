@@ -7,20 +7,20 @@
 
 #include "grayscale_bitmap.h"
 
-class FrameWinner {
-public:
-    FrameWinner(char, uint_fast8_t);
-
-    char symbol;
-    uint_fast8_t grayLvlDiff;
-};
+// class FrameWinner {
+// public:
+    // FrameWinner(char, uint_fast8_t);
+//
+    // char symbol;
+    // uint_fast8_t grayLvlDiff;
+// };
 
 class SymbolMatches {
 public:
     SymbolMatches(size_t framesQuantity, const std::string& symbolSet);
     SymbolMatches(const SymbolMatches&);
 
-    std::vector<FrameWinner> frameWinners;
+    std::vector<char> frameWinners;
     std::atomic_size_t progress;
     std::string symbolSet;
 };

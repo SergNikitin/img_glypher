@@ -10,19 +10,9 @@
 #include "sdl_interface.h"
 #include "comparison_thread.h"
 
-static char bestFrameMatchAmongThreads(const std::vector<SymbolMatches>& results,
+static char bestFrameMatchAmongThreads( const std::vector<SymbolMatches>& results,
                                         size_t frame) {
-    char bestMatch          = results.front().frameWinners.at(frame).symbol;
-    uint_fast8_t minDiff    = results.front().frameWinners.at(frame).grayLvlDiff;
-
-    for (const SymbolMatches& partialResult : results) {
-        uint_fast8_t diff = partialResult.frameWinners.at(frame).grayLvlDiff;
-
-        if (diff < minDiff) {
-            bestMatch = partialResult.frameWinners.at(frame).symbol;
-            minDiff = diff;
-        }
-    }
+    char bestMatch          = results.front().frameWinners.at(frame);
 
     return bestMatch;
 }
@@ -60,7 +50,8 @@ size_t slowestThreadProgress(const std::vector<SymbolMatches>& results) {
     return slowestThProgress;
 }
 
-uint_fast8_t const THREAD_CONTRIBUTION = 20;
+uint_fast8_t const THREAD_CONTRIBUTION = LAST_PRINTABLE_ASCII_SYMBOL
+                                        - FIRST_PRINTABLE_ASCII_SYMBOL;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
@@ -68,7 +59,8 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     FramedBitmap map = loadGrayscaleImage(imgPath);
     map.setFrameSize(getFontWidth(), getFontHeight());
 
-    uint_fast8_t threadsTotal = calcNeededThreads(THREAD_CONTRIBUTION);
+    // uint_fast8_t threadsTotal = calcNeededThreads(THREAD_CONTRIBUTION);
+    uint_fast8_t threadsTotal = 1;
 
     std::string dummySymbolSet(THREAD_CONTRIBUTION, ' ');
     SymbolMatches dummy(map.countFrames(), dummySymbolSet);
