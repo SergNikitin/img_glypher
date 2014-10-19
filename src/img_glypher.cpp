@@ -8,50 +8,9 @@
 #include "grayscale_bitmap.h"
 #include "freetype_interface.h"
 #include "sdl_interface.h"
-#include "comparison_thread.h"
+#include "image_processor.h"
 
-static char bestFrameMatchAmongThreads( const std::vector<SymbolMatches>& results,
-                                        size_t frame) {
-    char bestMatch          = results.front().frameWinners.at(frame);
-
-    return bestMatch;
-}
-
-static inline uint_fast8_t calcNeededThreads(uint_fast8_t threadContribution) {
-    uint_fast8_t symbolsTotal = LAST_PRINTABLE_ASCII_SYMBOL
-                                - FIRST_PRINTABLE_ASCII_SYMBOL;
-    uint_fast8_t threadsTotal = (symbolsTotal % threadContribution != 0)
-                                ? symbolsTotal / threadContribution + 1
-                                : symbolsTotal / threadContribution;
-
-    return threadsTotal;
-}
-
-static void assignSymbolTasksForThreads(std::vector<SymbolMatches>& res) {
-    char symbolTask = FIRST_PRINTABLE_ASCII_SYMBOL;
-
-    for (SymbolMatches& singleThreadRes : res) {
-        for (char& symbol : singleThreadRes.symbolSet) {
-            symbol = symbolTask <= LAST_PRINTABLE_ASCII_SYMBOL
-                    ? symbolTask++ : LAST_PRINTABLE_ASCII_SYMBOL;
-        }
-    }
-}
-
-size_t slowestThreadProgress(const std::vector<SymbolMatches>& results) {
-    size_t slowestThProgress = results.front().progress.load();
-    for (const SymbolMatches& result : results) {
-        size_t progress = result.progress.load();
-        if (progress < slowestThProgress) {
-            slowestThProgress = progress;
-        }
-    }
-
-    return slowestThProgress;
-}
-
-uint_fast8_t const THREAD_CONTRIBUTION = LAST_PRINTABLE_ASCII_SYMBOL
-                                        - FIRST_PRINTABLE_ASCII_SYMBOL;
+uint_fast8_t const THREADS_TOTAL = 5;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
@@ -59,32 +18,51 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     FramedBitmap map = loadGrayscaleImage(imgPath);
     map.setFrameSize(getFontWidth(), getFontHeight());
 
-    // uint_fast8_t threadsTotal = calcNeededThreads(THREAD_CONTRIBUTION);
-    uint_fast8_t threadsTotal = 1;
+    size_t framesTotal = map.countFrames();
+    ImageToTextResult dummy(framesTotal);
+    std::vector<ImageToTextResult> threadResults(THREADS_TOTAL, dummy);
+    std::vector<std::pair<FrameSlider, FrameSlider>> threadTasks;
 
-    std::string dummySymbolSet(THREAD_CONTRIBUTION, ' ');
-    SymbolMatches dummy(map.countFrames(), dummySymbolSet);
-    std::vector<SymbolMatches> threadResults(threadsTotal, dummy);
-    assignSymbolTasksForThreads(threadResults);
+    size_t framesPerThread = framesTotal % THREADS_TOTAL == 0
+                            ? framesTotal / THREADS_TOTAL
+                            : framesTotal / THREADS_TOTAL + 1;
 
-    for (SymbolMatches& container : threadResults) {
-        std::thread(processVocabularyPart, &map, &container).detach();
+    FrameSlider slider  = map.firstFrame();
+    FrameSlider imgEnd  = map.lastFrame();
+    for (uint_fast8_t threadNum = 0; threadNum < THREADS_TOTAL; ++threadNum) {
+        FrameSlider taskStart = slider;
+        for (size_t frame = 0; frame < framesPerThread; ++frame) {
+            if (slider == imgEnd) {break;}
+            slider.slide();
+        }
+
+        threadTasks.emplace_back(taskStart, slider);
+        std::thread(processImagePart,
+                    std::ref(threadTasks.back().first),
+                    std::ref(threadTasks.back().second),
+                    std::ref(threadResults.at(threadNum))).detach();
+
+        if (slider != imgEnd) {
+            slider.slide();
+        }
     }
 
     size_t processedFrames = 0;
-    size_t framesTotal = map.countFrames();
+    size_t nextThread = 0;
     size_t framesInRow = map.columns / map.frameWidth;
 
-    while (processedFrames < framesTotal) {
-        if (slowestThreadProgress(threadResults) > processedFrames) {
-            outfile << bestFrameMatchAmongThreads(threadResults, processedFrames);
+    while (nextThread < THREADS_TOTAL) {
+        if (threadResults.at(nextThread).done) {
+            size_t threadFrames = threadResults.at(nextThread).frameMatches.size();
+            for (size_t frame = 0; frame < threadFrames; ++frame) {
+                outfile << threadResults.at(nextThread).frameMatches.at(frame);
 
-            if (processedFrames % framesInRow == 0) {
-                outfile << '\n';
+                if (++processedFrames % framesInRow == 0) {
+                    outfile << '\n';
+                }
             }
 
-            ++processedFrames;
-
+            ++nextThread;
         }
     }
 }

@@ -172,6 +172,6 @@ obj_brightness getSymbolBrightness(char symbol) {
     return ft.brightnessVocab.at(symbol);
 }
 
-const brihgtness_map& getBrightnessMap() {
+const brihgtness_map& getBrightnessVocabulary() {
     return ft.brightnessVocab;
 }

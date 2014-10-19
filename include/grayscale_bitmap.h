@@ -57,8 +57,6 @@ public:
                 const size_t _width, const size_t _height,
                 size_t _leftBorderCol = 0, size_t _topBorderRow = 0);
 
-    virtual ~FrameSlider();
-
     void slide();
     obj_brightness at(size_t pos) const;
     size_t size() const;

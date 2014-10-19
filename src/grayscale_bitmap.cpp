@@ -123,8 +123,6 @@ FrameSlider::FrameSlider(const FramedBitmap& _map,
     }
 }
 
-FrameSlider::~FrameSlider() {}
-
 void FrameSlider::slide() {
     size_t newLeftBorder, newTopBorder;
 
@@ -145,12 +143,14 @@ void FrameSlider::slide() {
     topBorderRow = newTopBorder;
 }
 
+#include <iostream>
+
 obj_brightness FrameSlider::at(size_t pos) const {
     if (pos >= width * height) {
         throw std::out_of_range("Out of frame borders");
     }
 
-    size_t mapRow = topBorderRow + pos / width;
+    size_t mapRow    = topBorderRow  + pos / width;
     size_t mapColumn = leftBorderCol + pos % width;
 
     return map->pixels->at(mapRow * map->columns + mapColumn);
