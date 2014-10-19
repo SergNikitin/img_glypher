@@ -1,5 +1,6 @@
 #include <exception>
 #include <sstream>
+#include <algorithm>
 
 extern "C" {
     #include "ft2build.h"
@@ -29,15 +30,15 @@ public:
 
     FT_Library library;
     FT_Face fontFace;
-    brihgtness_map vocabulary;
+    brihgtness_map brightnessVocab;
 
 private:
     FreetypeMaintainer(const FreetypeMaintainer&);
 } ft;
 
-static gray_pixel averageSymbolBrightness(const GrayscaleBitmap& bitmap) {
+static obj_brightness averageBitmapBrightness(const GrayscaleBitmap& bitmap) {
     uint64_t acc = 0;
-    for (gray_pixel brightness : *bitmap.pixels) {
+    for (obj_brightness brightness : *bitmap.pixels) {
         acc += brightness;
     }
 
@@ -67,41 +68,39 @@ static GrayscaleBitmap asciiSymbolToBitmap(char symbol) {
     return GrayscaleBitmap(ft.fontFace);
 }
 
-static void expandBrightnessToFullRange(brihgtness_map& brMap) {
-    gray_pixel maxBrightness = brMap.begin()->second;
-    gray_pixel minBrightness = brMap.begin()->second;
-    for (auto& entry : brMap) {
-        if (entry.second > maxBrightness) {
-            maxBrightness = entry.second;
-        }
+template<typename T> static bool compareSecond(const T& lhs, const T& rhs) {
+    return lhs.second < rhs.second;
+}
 
-        if (entry.second < minBrightness) {
-            minBrightness = entry.second;
-        }
+static void expandBrightnessRange(brihgtness_map& brMap) {
+    obj_brightness maxBr = std::max_element(brMap.begin(), brMap.end(),
+                                compareSecond<symbol_brightness_pair>)->second;
 
-    }
+    obj_brightness minBr = std::min_element(brMap.begin(), brMap.end(),
+                                compareSecond<symbol_brightness_pair>)->second;
 
-    for (auto& entry : brMap) {
-        uint16_t correctedBrightness = entry.second - minBrightness;
-        correctedBrightness *= MAX_GRAY_LEVELS;
-        correctedBrightness /= (maxBrightness - minBrightness);
-        entry.second = correctedBrightness;
+    for (symbol_brightness_pair& entry : brMap) {
+        uint16_t correctedBr = entry.second - minBr;
+        correctedBr *= MAX_GRAY_LEVELS;
+        correctedBr /= maxBr - minBr;
+        entry.second = correctedBr;
     }
 }
 
 static void initVocabulary() {
-    ft.vocabulary.clear();
+    ft.brightnessVocab.clear();
 
     for (char   symbol = FIRST_PRINTABLE_ASCII_SYMBOL;
                 symbol <= LAST_PRINTABLE_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap bitmap = asciiSymbolToBitmap(symbol);
-        gray_pixel brightness = MAX_GRAY_LEVELS - averageSymbolBrightness(bitmap);
-        // gray_pixel brightness = averageSymbolBrightness(bitmap);
-        symbol_brightness entry(symbol, brightness);
-        ft.vocabulary.insert(entry);
+        // obj_brightness brightness = MAX_GRAY_LEVELS
+                                    // - averageBitmapBrightness(bitmap);
+        obj_brightness brightness = averageBitmapBrightness(bitmap);
+        symbol_brightness_pair entry(symbol, brightness);
+        ft.brightnessVocab.insert(entry);
     }
 
-    expandBrightnessToFullRange(ft.vocabulary);
+    expandBrightnessRange(ft.brightnessVocab);
 }
 
 static void loadDefaultFaceFromFontFile(const std::string& fontPath,
@@ -155,7 +154,7 @@ void setFontFile(const std::string& filepath) {
 
     loadDefaultFaceFromFontFile(filepath, ft.library, ft.fontFace);
     checkFontfaceFormat(ft.fontFace);
-    setCharSizeInPoints(ft.fontFace, 10, DEFAULT_HORIZ_RES,
+    setCharSizeInPoints(ft.fontFace, 6, DEFAULT_HORIZ_RES,
                         DEFAULT_VERTICAL_RES);
 
     initVocabulary();
@@ -169,10 +168,10 @@ uint_fast16_t getFontWidth() {
     return ft.fontFace->size->metrics.max_advance / FIXED_POINT_26_6_COEFF;
 }
 
-gray_pixel getSymbolBrightness(char symbol) {
-    return ft.vocabulary.at(symbol);
+obj_brightness getSymbolBrightness(char symbol) {
+    return ft.brightnessVocab.at(symbol);
 }
 
 const brihgtness_map& getBrightnessMap() {
-    return ft.vocabulary;
+    return ft.brightnessVocab;
 }

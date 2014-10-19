@@ -145,7 +145,7 @@ void FrameSlider::slide() {
     topBorderRow = newTopBorder;
 }
 
-gray_pixel FrameSlider::at(size_t pos) const {
+obj_brightness FrameSlider::at(size_t pos) const {
     if (pos >= width * height) {
         throw std::out_of_range("Out of frame borders");
     }

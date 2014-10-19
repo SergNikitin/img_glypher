@@ -13,8 +13,8 @@ extern "C" {
 
 const uint_fast8_t MAX_GRAY_LEVELS = 255;
 
-typedef unsigned char gray_pixel;
-typedef std::vector<gray_pixel> pixels_vector;
+typedef unsigned char obj_brightness;
+typedef std::vector<obj_brightness> pixels_vector;
 typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
 
 class GrayscaleBitmap {
@@ -60,7 +60,7 @@ public:
     virtual ~FrameSlider();
 
     void slide();
-    gray_pixel at(size_t pos) const;
+    obj_brightness at(size_t pos) const;
     size_t size() const;
 
     bool operator==(const FrameSlider&) const;

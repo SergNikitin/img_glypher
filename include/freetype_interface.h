@@ -4,13 +4,13 @@
 #include <map>
 #include "grayscale_bitmap.h"
 
-typedef std::pair<unsigned char, gray_pixel> symbol_brightness;
-typedef std::map<unsigned char, gray_pixel> brihgtness_map;
+typedef std::pair<const char, obj_brightness> symbol_brightness_pair;
+typedef std::map< const char, obj_brightness> brihgtness_map;
 
 void setFontFile(const std::string& newFilePath);
 uint_fast16_t getFontHeight();
 uint_fast16_t getFontWidth();
-gray_pixel getSymbolBrightness(char symbol);
+obj_brightness getSymbolBrightness(char symbol);
 const brihgtness_map& getBrightnessMap();
 
 const char FIRST_PRINTABLE_ASCII_SYMBOL = ' ';

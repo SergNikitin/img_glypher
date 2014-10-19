@@ -16,7 +16,7 @@ SymbolMatches::SymbolMatches(const SymbolMatches& toCopy)
     , symbolSet(toCopy.symbolSet) {
 }
 
-static gray_pixel averageFrameBrightness(const FrameSlider& imgPart) {
+static obj_brightness averageFrameBrightness(const FrameSlider& imgPart) {
     uint64_t acc = 0;
     size_t frameSize = imgPart.size();
     for (size_t pixelNum = 0; pixelNum < frameSize; ++pixelNum) {
@@ -26,14 +26,14 @@ static gray_pixel averageFrameBrightness(const FrameSlider& imgPart) {
     return acc / frameSize;
 }
 
-static char bestBrightnessMatch(gray_pixel frameBrightness) {
+static char bestBrightnessMatch(obj_brightness frameBrightness) {
     brihgtness_map brightnessMap = getBrightnessMap();
 
-    gray_pixel leastBrightnessDiff = MAX_GRAY_LEVELS;
+    obj_brightness leastBrightnessDiff = MAX_GRAY_LEVELS;
     char bestMatch = brightnessMap.begin()->first;
 
     for (auto& entry : brightnessMap) {
-        gray_pixel brightnessDiff = abs(static_cast<int>(frameBrightness)
+        obj_brightness brightnessDiff = abs(static_cast<int>(frameBrightness)
                                         - entry.second);
         if (brightnessDiff < leastBrightnessDiff) {
             leastBrightnessDiff = brightnessDiff;
@@ -57,7 +57,7 @@ static char chooseMatchingSymbol(const FrameSlider& imgPart) {
         // }
     // }
 
-    gray_pixel frameBrightness = averageFrameBrightness(imgPart);
+    obj_brightness frameBrightness = averageFrameBrightness(imgPart);
 
     // std::cout << (int)frameBrightness << std::endl;
     // return FrameWinner(bestMatch, minDiff);
@@ -74,7 +74,7 @@ void processVocabularyPart(const FramedBitmap* map, SymbolMatches* matches) {
             ++matches->progress;
         }
 
-        gray_pixel match = chooseMatchingSymbol(lastFrame);
+        obj_brightness match = chooseMatchingSymbol(lastFrame);
         matches->frameWinners.push_back(match);
         ++matches->progress;
     }
