@@ -10,62 +10,72 @@
 #include "sdl_interface.h"
 #include "image_processor.h"
 
-uint_fast8_t const THREADS_TOTAL = 4;
-void imageToText(const std::string& imgPath, const std::string& fontPath) {
+static void writeThreadsOutputToFile(const std::vector<ImageToTextResult>& thResults,
+                                    size_t symbolsInLine) {
     std::ofstream outfile("test.txt");
 
-    setFontFile(fontPath);
-    FramedBitmap map = loadGrayscaleImage(imgPath);
-    map.setFrameSize(getFontWidth(), getFontHeight());
+    size_t symbolsInFile = 0;
+    for (const ImageToTextResult& oneThResult : thResults) {
+        while (!oneThResult.done);
 
+        for (char frameMatch : oneThResult.frameMatches) {
+            outfile << frameMatch;
+
+            if (++symbolsInFile % symbolsInLine == 0) {
+                outfile << '\n';
+            }
+        }
+    }
+}
+
+typedef std::pair<FrameSlider, FrameSlider> img_data_range;
+static void assignThreadTasks(  const FramedBitmap& map,
+                                std::vector<img_data_range>& tasks,
+                                uint_fast8_t threadsNum) {
     size_t framesTotal = map.countFrames();
-    ImageToTextResult dummy(framesTotal);
-    std::vector<ImageToTextResult> threadResults(THREADS_TOTAL, dummy);
-    std::vector<std::pair<FrameSlider, FrameSlider>> threadTasks;
-    threadTasks.reserve(THREADS_TOTAL);
-
-    size_t framesPerThread = framesTotal % THREADS_TOTAL == 0
-                            ? framesTotal / THREADS_TOTAL
-                            : framesTotal / THREADS_TOTAL + 1;
+    size_t framesPerThread = framesTotal % threadsNum == 0
+                            ? framesTotal / threadsNum
+                            : framesTotal / threadsNum + 1;
 
     FrameSlider slider  = map.firstFrame();
     FrameSlider imgEnd  = map.lastFrame();
-    for (uint_fast8_t threadNum = 0; threadNum < THREADS_TOTAL; ++threadNum) {
+    for (uint_fast8_t threadNum = 0; threadNum < threadsNum; ++threadNum) {
         FrameSlider taskStart = slider;
         for (size_t frame = 0; frame < framesPerThread; ++frame) {
             if (slider == imgEnd) {break;}
             slider.slide();
         }
 
-        threadTasks.emplace_back(taskStart, slider);
-        std::thread(processImagePart,
-                    std::ref(threadTasks.back().first),
-                    std::ref(threadTasks.back().second),
-                    std::ref(threadResults.at(threadNum))).detach();
+        tasks.emplace_back(taskStart, slider);
 
         if (slider != imgEnd) {
             slider.slide();
         }
     }
+}
 
-    size_t processedFrames = 0;
-    size_t nextThread = 0;
-    size_t framesInRow = map.columns / map.frameWidth;
+uint_fast8_t const THREADS_TOTAL = 4;
+void imageToText(const std::string& imgPath, const std::string& fontPath) {
 
-    while (nextThread < THREADS_TOTAL) {
-        if (threadResults.at(nextThread).done) {
-            size_t threadFrames = threadResults.at(nextThread).frameMatches.size();
-            for (size_t frame = 0; frame < threadFrames; ++frame) {
-                outfile << threadResults.at(nextThread).frameMatches.at(frame);
+    setFontFile(fontPath);
+    FramedBitmap map = loadGrayscaleImage(imgPath);
+    map.setFrameSize(getFontWidth(), getFontHeight());
 
-                if (++processedFrames % framesInRow == 0) {
-                    outfile << '\n';
-                }
-            }
+    ImageToTextResult resDummy(map.countFrames());
+    std::vector<ImageToTextResult> threadResults(THREADS_TOTAL, resDummy);
+    std::vector<img_data_range> threadTasks;
 
-            ++nextThread;
-        }
+    assignThreadTasks(map, threadTasks, THREADS_TOTAL);
+
+    for (uint_fast8_t threadNum = 0; threadNum < THREADS_TOTAL; ++threadNum) {
+        std::thread(processImagePart,
+                    std::ref(threadTasks.at(threadNum).first),
+                    std::ref(threadTasks.at(threadNum).second),
+                    std::ref(threadResults.at(threadNum))).detach();
     }
+
+    size_t framesInRow = map.columns / map.frameWidth;
+    writeThreadsOutputToFile(threadResults, framesInRow);
 }
 
 int main(int argc, char* argv[]) {
