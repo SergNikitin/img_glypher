@@ -20,10 +20,10 @@ and build its dependencies
 
 ## How to use
 
-In this unfinished state the program accepts only two arguements when launched
-from the terminal:
-* path to *.bmp image you want to convert (more image extensions will be available in future)
-* path to font file you want to use a base for conversion (font must be monospaced)
+Image Glypher accepts the following command-line arguements:
+* `--image=<path_to_image>` - path to *.bmp image you want to convert (more image extensions will be available in future)
+* `--font=<path_to_font>` - path to font file you want to use a base for conversion (font must be monospaced)
+* `--fontsize=<size>` - defines how detailed the output will be
 
 Example:
 
