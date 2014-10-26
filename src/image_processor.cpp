@@ -51,13 +51,12 @@ static char matchFrameToSymbol(const FrameSlider& imgPart) {
 void processImagePart(  FrameSlider& start, const FrameSlider& end,
                         ImageToTextResult& result) {
     try {
-        FrameSlider lastFrame = end;
-        for (FrameSlider frame = start; frame != lastFrame; frame.slide()) {
+        for (FrameSlider frame = start; frame != end; frame.slide()) {
             char match = matchFrameToSymbol(frame);
             result.frameMatches.push_back(match);
         }
 
-        char match = matchFrameToSymbol(lastFrame);
+        char match = matchFrameToSymbol(end);
         result.frameMatches.push_back(match);
         result.done = true;
     }

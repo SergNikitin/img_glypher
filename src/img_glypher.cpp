@@ -10,7 +10,7 @@
 #include "sdl_interface.h"
 #include "image_processor.h"
 
-uint_fast8_t const THREADS_TOTAL = 5;
+uint_fast8_t const THREADS_TOTAL = 4;
 void imageToText(const std::string& imgPath, const std::string& fontPath) {
     std::ofstream outfile("test.txt");
 
@@ -22,6 +22,7 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
     ImageToTextResult dummy(framesTotal);
     std::vector<ImageToTextResult> threadResults(THREADS_TOTAL, dummy);
     std::vector<std::pair<FrameSlider, FrameSlider>> threadTasks;
+    threadTasks.reserve(THREADS_TOTAL);
 
     size_t framesPerThread = framesTotal % THREADS_TOTAL == 0
                             ? framesTotal / THREADS_TOTAL
