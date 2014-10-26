@@ -1,11 +1,13 @@
 # IMG_GLYPHER
 
-Small program for generating ASCII-art from images
+Small program for ASCII-art generation from images. Currently is in unfinished state,
+works best on images with both dark and bright areas.
 
 ## Examples
 
-[spacemarine_src]
-[spacemarine_ascii]
+![spacemarine_src]
+
+![spacemarine_ascii]
 
 ## How to build
 
