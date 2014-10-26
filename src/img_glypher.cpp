@@ -42,7 +42,10 @@ static void assignThreadTasks(  const FramedBitmap& map,
     for (uint_fast8_t threadNum = 0; threadNum < threadsNum; ++threadNum) {
         FrameSlider taskStart = slider;
         for (size_t frame = 0; frame < framesPerThread; ++frame) {
-            if (slider == imgEnd) {break;}
+            if (slider == imgEnd) {
+                break;
+            }
+
             slider.slide();
         }
 
