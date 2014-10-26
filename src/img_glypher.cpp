@@ -60,8 +60,7 @@ static void assignThreadTasks(  const FramedBitmap& map,
 
 uint_fast8_t const THREADS_TOTAL = 4;
 void imageToText(const Settings& settings) {
-
-    setFont(settings.fontPath, settings.fontSize);
+    setupFont(settings.fontPath, settings.fontSize, settings.invert);
     FramedBitmap map = loadGrayscaleImage(settings.imagePath);
     map.setFrameSize(getFontWidth(), getFontHeight());
 

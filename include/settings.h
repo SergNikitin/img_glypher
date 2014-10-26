@@ -7,6 +7,7 @@ struct Settings {
     std::string imagePath;
     std::string fontPath;
     uint_fast16_t fontSize;
+    bool invert;
     bool abort;
 };
 

@@ -87,15 +87,16 @@ static void expandBrightnessRange(brihgtness_map& brMap) {
     }
 }
 
-static void initVocabulary() {
+static void initVocabulary(bool invertBrightness) {
     ft.brightnessVocab.clear();
 
     for (char   symbol = FIRST_PRINTABLE_ASCII_SYMBOL;
                 symbol <= LAST_PRINTABLE_ASCII_SYMBOL; ++symbol) {
         GrayscaleBitmap bitmap = asciiSymbolToBitmap(symbol);
-        // obj_brightness brightness = MAX_GRAY_LEVELS
-                                    // - averageBitmapBrightness(bitmap);
-        obj_brightness brightness = averageBitmapBrightness(bitmap);
+        obj_brightness brightness =
+                            invertBrightness
+                            ? MAX_GRAY_LEVELS - averageBitmapBrightness(bitmap)
+                            : averageBitmapBrightness(bitmap);
         symbol_brightness_pair entry(symbol, brightness);
         ft.brightnessVocab.insert(entry);
     }
@@ -148,7 +149,7 @@ static void setCharSizeInPoints(FT_Face& face, uint32_t size,
     }
 }
 
-void setFont(const std::string& fontpath, uint_fast16_t fontSize) {
+void setupFont(const std::string& fontpath, uint_fast16_t fontSize, bool invert) {
     static const FT_UInt DEFAULT_HORIZ_RES          = 72;
     static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
 
@@ -157,7 +158,7 @@ void setFont(const std::string& fontpath, uint_fast16_t fontSize) {
     setCharSizeInPoints(ft.fontFace, fontSize, DEFAULT_HORIZ_RES,
                         DEFAULT_VERTICAL_RES);
 
-    initVocabulary();
+    initVocabulary(invert);
 }
 
 uint_fast16_t getFontHeight() {
