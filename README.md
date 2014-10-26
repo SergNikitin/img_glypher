@@ -36,4 +36,4 @@ Example:
 
 
 [spacemarine_src]:http://i.imgur.com/uVqEyLb.jpg
-[spacemarine_ascii]:http//i.imgur.com//Z2M6zIO.png
+[spacemarine_ascii]:http//i.imgur.com/Z2M6zIO.png
