@@ -85,6 +85,10 @@ void imageToText(const Settings& settings) {
 int main(int argc, char* argv[]) {
     try {
         Settings settings = parseArguments(argc, argv);
+        if (settings.abort) {
+            return 0;
+        }
+
         imageToText(settings);
     }
     catch (const std::exception& error) {

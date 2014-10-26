@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <getopt.h>
 
 #include "settings.h"
@@ -8,7 +9,8 @@
 Settings::Settings()
     : imagePath("image_unspecified")
     , fontPath("font_unspecified")
-    , fontSize(6) {}
+    , fontSize(6)
+    , abort(false) {}
 
 enum ArguementCodes {
     IMAGE_ID = 1, FONT_ID, FONTSIZE_ID, HELP_ID
@@ -21,6 +23,33 @@ static std::vector<option> options = {
     {"help",    no_argument,       NULL, HELP_ID        },
     {0,         0,                 NULL, 0              }
 };
+
+static std::map<std::string, std::string> settingsHelp = {
+    {"image",   "path to *.bmp image you want to convert"},
+    {"font",    "path to font file you want to use a base for conversion (font must be monospaced)"},
+    {"fontsize","defines how detailed the output will be, must be 1 or more"},
+    {"help",    "print help"}
+};
+
+static void printHelp() {
+    std::cout << "Image glypher accepts the following options:\n";
+    for (option& opt : options) {
+        if (!opt.name) {
+            continue;
+        }
+
+        auto helpEntryIter = settingsHelp.find(std::string(opt.name));
+        if (helpEntryIter != settingsHelp.end()) {
+            std::cout << '\t' << "--" << helpEntryIter->first << "\t- "
+                        << helpEntryIter->second << '\n';
+        }
+    }
+
+    std::cout << "\nReport img_glypher bugs to "
+                << "https://github.com/SergNikitin/img_glypher/issues\n";
+    std::cout << "Made by Sergey Nikitin - snikitin@outlook.com, 2014" << std::endl;
+}
+
 
 Settings parseArguments(int argc, char* argv[]) {
     Settings settings;
@@ -55,7 +84,8 @@ Settings parseArguments(int argc, char* argv[]) {
             break;
 
             case HELP_ID: {
-                std::cout << "i am help" << std::endl;
+                printHelp();
+                settings.abort = true;
             }
             break;
 
