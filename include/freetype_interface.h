@@ -7,7 +7,7 @@
 typedef std::pair<const char, obj_brightness> symbol_brightness_pair;
 typedef std::map< const char, obj_brightness> brihgtness_map;
 
-void setFontFile(const std::string& newFilePath);
+void setFont(const std::string& fontpath, uint_fast16_t fontSize);
 uint_fast16_t getFontHeight();
 uint_fast16_t getFontWidth();
 

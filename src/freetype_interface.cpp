@@ -148,13 +148,13 @@ static void setCharSizeInPoints(FT_Face& face, uint32_t size,
     }
 }
 
-void setFontFile(const std::string& filepath) {
+void setFont(const std::string& fontpath, uint_fast16_t fontSize) {
     static const FT_UInt DEFAULT_HORIZ_RES          = 72;
     static const FT_UInt DEFAULT_VERTICAL_RES       = DEFAULT_HORIZ_RES;
 
-    loadDefaultFaceFromFontFile(filepath, ft.library, ft.fontFace);
+    loadDefaultFaceFromFontFile(fontpath, ft.library, ft.fontFace);
     checkFontfaceFormat(ft.fontFace);
-    setCharSizeInPoints(ft.fontFace, 6, DEFAULT_HORIZ_RES,
+    setCharSizeInPoints(ft.fontFace, fontSize, DEFAULT_HORIZ_RES,
                         DEFAULT_VERTICAL_RES);
 
     initVocabulary();

@@ -5,6 +5,7 @@
 #include <exception>
 #include <thread>
 
+#include "settings.h"
 #include "grayscale_bitmap.h"
 #include "freetype_interface.h"
 #include "sdl_interface.h"
@@ -58,10 +59,10 @@ static void assignThreadTasks(  const FramedBitmap& map,
 }
 
 uint_fast8_t const THREADS_TOTAL = 4;
-void imageToText(const std::string& imgPath, const std::string& fontPath) {
+void imageToText(const Settings settings) {
 
-    setFontFile(fontPath);
-    FramedBitmap map = loadGrayscaleImage(imgPath);
+    setFont(settings.fontPath, settings.fontSize);
+    FramedBitmap map = loadGrayscaleImage(settings.imagePath);
     map.setFrameSize(getFontWidth(), getFontHeight());
 
     ImageToTextResult resDummy(map.countFrames());
@@ -82,16 +83,10 @@ void imageToText(const std::string& imgPath, const std::string& fontPath) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "incorrect number of arguements: " << argc << std::endl;
-        return 1;
-    }
-
-    std::string imageFilePath(argv[1]);
-    std::string fontFilePath(argv[2]);
 
     try {
-        imageToText(imageFilePath, fontFilePath);
+        Settings settings = parseArguments(argc, argv);
+        imageToText(settings);
     }
     catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;
