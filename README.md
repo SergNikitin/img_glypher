@@ -27,7 +27,7 @@ Image Glypher accepts the following command-line arguements:
 
 Example:
 
-`./img_glypher --image./my_image.bmp --font=/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf --fontsize=10`
+`./img_glypher --image=./my_image.bmp --font=/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf --fontsize=10`
 
 ## Dependencies
 
