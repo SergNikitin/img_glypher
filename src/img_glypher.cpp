@@ -16,7 +16,7 @@ static void writeThreadsOutputToFile(const std::vector<ImageToTextResult>& thRes
 
     size_t symbolsInFile = 0;
     for (const ImageToTextResult& oneThResult : thResults) {
-        while (!oneThResult.done);
+        while (!oneThResult.done.load());
 
         for (char frameMatch : oneThResult.frameMatches) {
             outfile << frameMatch;

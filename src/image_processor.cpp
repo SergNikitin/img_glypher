@@ -25,12 +25,12 @@ static obj_brightness averageFrameBrightness(const FrameSlider& imgPart) {
 }
 
 static char symbolWithBrightnessClosestTo(obj_brightness targetBrightness) {
-    brihgtness_map vocabulary = getBrightnessVocabulary();
+    const brihgtness_map vocabulary = getBrightnessVocabulary();
 
     obj_brightness leastBrDiff = MAX_GRAY_LEVELS;
     char bestMatch = vocabulary.begin()->first;
 
-    for (symbol_brightness_pair& entry : vocabulary) {
+    for (const symbol_brightness_pair& entry : vocabulary) {
         obj_brightness brDiff = abs(static_cast<int>(targetBrightness)
                                     - entry.second);
         if (brDiff < leastBrDiff) {

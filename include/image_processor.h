@@ -1,5 +1,5 @@
-#ifndef __image_processor_H__
-#define __image_processor_H__
+#ifndef __IMAGE_PROCESSOR_H__
+#define __IMAGE_PROCESSOR_H__
 
 #include <memory>
 #include <vector>
@@ -19,4 +19,4 @@ public:
 void processImagePart(  FrameSlider &start, const FrameSlider& end,
                         ImageToTextResult& result);
 
-#endif // __image_processor_H__
+#endif // __IMAGE_PROCESSOR_H__

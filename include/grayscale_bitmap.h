@@ -32,7 +32,6 @@ public:
     const uint_fast8_t num_grays;
 };
 
-class FramedBitmap;
 class FrameSlider;
 
 class FramedBitmap : public GrayscaleBitmap {
@@ -48,7 +47,6 @@ public:
 
     size_t frameWidth;
     size_t frameHeight;
-private:
 };
 
 class FrameSlider {
