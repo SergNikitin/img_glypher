@@ -22,7 +22,8 @@ and build its dependencies
 
 Image Glypher accepts the following command-line arguements:
 * `--image=<path_to_image>` - path to *.bmp image you want to convert (more image extensions will be available in future)
-* `--font=<path_to_font>` - path to font file you want to use a base for conversion (font must be monospaced)
+* `--font=<path_to_font>` - path to font file you want to use as a base for conversion
+(font must be monospaced)
 * `--fontsize=<size>` - defines how detailed the output will be, must be 1 or greater
 
 Example:

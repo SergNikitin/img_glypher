@@ -26,7 +26,7 @@ static std::vector<option> options = {
 
 static std::map<std::string, std::string> settingsHelp = {
     {"image",   "path to *.bmp image you want to convert"},
-    {"font",    "path to font file you want to use a base for conversion (font must be monospaced)"},
+    {"font",    "path to font file you want to use as a base for conversion (font must be monospaced)"},
     {"fontsize","defines how detailed the output will be, must be 1 or more"},
     {"help",    "print help"}
 };
