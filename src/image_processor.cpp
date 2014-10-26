@@ -24,24 +24,6 @@ static obj_brightness averageFrameBrightness(const FrameSlider& imgPart) {
     return acc / frameSize;
 }
 
-static char symbolWithBrightnessClosestTo(obj_brightness targetBrightness) {
-    const brihgtness_map vocabulary = getBrightnessVocabulary();
-
-    obj_brightness leastBrDiff = MAX_GRAY_LEVELS;
-    char bestMatch = vocabulary.begin()->first;
-
-    for (const symbol_brightness_pair& entry : vocabulary) {
-        obj_brightness brDiff = abs(static_cast<int>(targetBrightness)
-                                    - entry.second);
-        if (brDiff < leastBrDiff) {
-            leastBrDiff = brDiff;
-            bestMatch = entry.first;
-        }
-    }
-
-    return bestMatch;
-}
-
 static char matchFrameToSymbol(const FrameSlider& imgPart) {
     obj_brightness frameBrightness = averageFrameBrightness(imgPart);
 

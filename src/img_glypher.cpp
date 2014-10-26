@@ -100,6 +100,5 @@ int main(int argc, char* argv[]) {
         std::cerr << "Unknown exception caught" << std::endl;
     }
 
-
     return 0;
 }

@@ -10,8 +10,10 @@ typedef std::map< const char, obj_brightness> brihgtness_map;
 void setFontFile(const std::string& newFilePath);
 uint_fast16_t getFontHeight();
 uint_fast16_t getFontWidth();
+
 obj_brightness getSymbolBrightness(char symbol);
 const brihgtness_map& getBrightnessVocabulary();
+char symbolWithBrightnessClosestTo(obj_brightness targetBrightness);
 
 const char FIRST_PRINTABLE_ASCII_SYMBOL = ' ';
 const char LAST_PRINTABLE_ASCII_SYMBOL  = '~';

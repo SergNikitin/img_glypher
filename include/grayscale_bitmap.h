@@ -11,11 +11,11 @@ extern "C" {
     #include "SDL.h"
 }
 
-const uint_fast8_t MAX_GRAY_LEVELS = 255;
-
-typedef unsigned char obj_brightness;
+typedef uint_fast8_t obj_brightness;
 typedef std::vector<obj_brightness> pixels_vector;
 typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
+
+const obj_brightness MAX_GRAY_LEVELS = 255;
 
 class GrayscaleBitmap {
 public:

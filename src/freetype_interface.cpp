@@ -175,3 +175,19 @@ obj_brightness getSymbolBrightness(char symbol) {
 const brihgtness_map& getBrightnessVocabulary() {
     return ft.brightnessVocab;
 }
+
+char symbolWithBrightnessClosestTo(obj_brightness targetBrightness) {
+    obj_brightness leastBrDiff = MAX_GRAY_LEVELS;
+    char bestMatch = ft.brightnessVocab.begin()->first;
+
+    for (const symbol_brightness_pair& entry : ft.brightnessVocab) {
+        obj_brightness brDiff = abs(static_cast<int>(targetBrightness)
+                                    - entry.second);
+        if (brDiff < leastBrDiff) {
+            leastBrDiff = brDiff;
+            bestMatch = entry.first;
+        }
+    }
+
+    return bestMatch;
+}
