@@ -23,11 +23,11 @@ and build its dependencies
 Image Glypher accepts the following command-line arguements:
 * `--image=<path_to_image>` - path to *.bmp image you want to convert (more image extensions will be available in future)
 * `--font=<path_to_font>` - path to font file you want to use a base for conversion (font must be monospaced)
-* `--fontsize=<size>` - defines how detailed the output will be
+* `--fontsize=<size>` - defines how detailed the output will be, must be 1 or greater
 
 Example:
 
-`./img_glypher ./my_image.bmp /usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf`
+`./img_glypher --image./my_image.bmp --font=/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf --fontsize=10`
 
 ## Dependencies
 
