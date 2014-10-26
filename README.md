@@ -1,7 +1,8 @@
-# IMG_GLYPHER
+# Image Glypher - ASCII-art generator
 
-Small program for ASCII-art generation from images. Currently is in unfinished state,
-works best on images with both dark and bright areas.
+Small program for ASCII-art generation from images. Developed not just for the
+sake of learning new stuff, but because it was a fun task, too! Currently is in
+unfinished state, works best on images with both dark and bright areas.
 
 ## Examples
 
@@ -11,7 +12,7 @@ works best on images with both dark and bright areas.
 
 ## How to build
 
-Currently build only under Linux. g++ compiler is used
+Currently builds only on Linux. g++ compiler is used
 
 1. Run `cmake .` command in the sources directory
 2. Run `make` command to build the program as well as automatically download
@@ -21,7 +22,7 @@ and build its dependencies
 
 In this unfinished state the program accepts only two arguements when launched
 from the terminal:
-* path to .bmp image you want to convert (more image extensions will be available in future)
+* path to *.bmp image you want to convert (more image extensions will be available in future)
 * path to font file you want to use a base for conversion (font must be monospaced)
 
 Example:
@@ -31,8 +32,7 @@ Example:
 ## Dependencies
 
 * [FreeType](http://freetype.org/) for retrieving font data
-* [SDL2](https://www.libsdl.org/download-2.0.php)
-+ [SDL_Image](https://www.libsdl.org/projects/SDL_image/) for retrieving image data
+* [SDL2](https://www.libsdl.org/download-2.0.php) and [SDL_Image](https://www.libsdl.org/projects/SDL_image/) for retrieving image data
 
 
 [spacemarine_src]:http://i.imgur.com/uVqEyLb.jpg
