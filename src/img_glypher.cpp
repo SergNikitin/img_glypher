@@ -59,7 +59,7 @@ static void assignThreadTasks(  const FramedBitmap& map,
 }
 
 uint_fast8_t const THREADS_TOTAL = 4;
-void imageToText(const Settings settings) {
+void imageToText(const Settings& settings) {
 
     setFont(settings.fontPath, settings.fontSize);
     FramedBitmap map = loadGrayscaleImage(settings.imagePath);
@@ -83,7 +83,6 @@ void imageToText(const Settings settings) {
 }
 
 int main(int argc, char* argv[]) {
-
     try {
         Settings settings = parseArguments(argc, argv);
         imageToText(settings);
