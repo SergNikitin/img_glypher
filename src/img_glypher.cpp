@@ -11,9 +11,10 @@
 #include "sdl_interface.h"
 #include "image_processor.h"
 
-static void writeThreadsOutputToFile(const std::vector<ImageToTextResult>& thResults,
+static void writeThreadsOutputToFile(const std::string& outfilePath,
+                                    const std::vector<ImageToTextResult>& thResults,
                                     size_t symbolsInLine) {
-    std::ofstream outfile("test.txt");
+    std::ofstream outfile(outfilePath);
 
     size_t symbolsInFile = 0;
     for (const ImageToTextResult& oneThResult : thResults) {
@@ -78,17 +79,23 @@ void imageToText(const Settings& settings) {
     }
 
     size_t framesInRow = map.columns / map.frameWidth;
-    writeThreadsOutputToFile(threadResults, framesInRow);
+    writeThreadsOutputToFile(settings.outfile, threadResults, framesInRow);
 }
 
 int main(int argc, char* argv[]) {
     try {
         Settings settings = parseArguments(argc, argv);
+
         if (settings.abort) {
-            return 0;
+            std::cerr << "Aborted due to invalid settings" << std::endl;
+            return 1;
         }
 
+        std::cout << settings.outfile << std::endl;
+
         imageToText(settings);
+
+        return 0;
     }
     catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;
@@ -97,5 +104,5 @@ int main(int argc, char* argv[]) {
         std::cerr << "Unknown exception caught" << std::endl;
     }
 
-    return 0;
+    return 1;
 }
