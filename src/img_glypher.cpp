@@ -91,8 +91,6 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        std::cout << settings.outfile << std::endl;
-
         imageToText(settings);
 
         return 0;
