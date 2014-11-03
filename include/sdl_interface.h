@@ -1,6 +1,11 @@
 #ifndef __SDL_INTERFACE_H__
 #define __SDL_INTERFACE_H__
 
+/**
+ * @file sdl_interface.h
+ * @brief Image library driver
+ */
+
 #include <string>
 #include "grayscale_bitmap.h"
 

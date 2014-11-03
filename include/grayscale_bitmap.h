@@ -1,6 +1,11 @@
 #ifndef __GRAYSCALE_BITMAP_H__
 #define __GRAYSCALE_BITMAP_H__
 
+/**
+ * @file grayscale_bitmap.h
+ * @brief Common image data storage module
+ */
+
 #include <memory>
 #include <vector>
 

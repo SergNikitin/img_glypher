@@ -1,6 +1,11 @@
 #ifndef __FREETYPE_INTERFACE_H__
 #define __FREETYPE_INTERFACE_H__
 
+/**
+ * @file freetype_interface.h
+ * @brief Font library driver
+ */
+
 #include <map>
 #include "grayscale_bitmap.h"
 

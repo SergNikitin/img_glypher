@@ -1,6 +1,11 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
+/**
+ * @file settings.h
+ * @brief User-input settings parser
+ */
+
 
 /**
  * @brief Object for application's general settings storage and transportation

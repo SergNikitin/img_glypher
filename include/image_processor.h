@@ -1,6 +1,11 @@
 #ifndef __IMAGE_PROCESSOR_H__
 #define __IMAGE_PROCESSOR_H__
 
+/**
+ * @file image_processor.h
+ * @brief Multithreaded image processing module
+ */
+
 #include <memory>
 #include <vector>
 #include <atomic>

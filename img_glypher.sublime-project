@@ -17,6 +17,7 @@
             "folder_exclude_patterns":
             [
                 "product",
+                "docs",
                 "CMakeFiles",
                 "build_utils",
             ]
