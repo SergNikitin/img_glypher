@@ -4,7 +4,10 @@
 #include <vector>
 #include <map>
 #include <regex>
-#include <getopt.h>
+
+extern "C" {
+    #include <getopt.h>
+}
 
 #include "settings.h"
 
