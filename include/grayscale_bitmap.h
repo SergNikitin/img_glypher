@@ -19,21 +19,21 @@ const obj_brightness MAX_GRAY_LEVELS = 255;
 
 /**
  * @brief Grayscale bitmap that stores pixel data
- * @details Interface object that is used in other modules, is essentially
+ * @details Interface object that is used in other modules, essentially
  * a wrapper over the different implemetations of the same thing provided by
  * font and image libraries
  */
 class GrayscaleBitmap {
 public:
     /**
-     * @brief Wraps FreeType2 fontface data into interface object
+     * @brief Place FreeType2 font image data into an interface object
      *
      * @param  Pointer to valid FreeType2 FT_FaceRec object
      */
     explicit GrayscaleBitmap(const FT_Face);
 
     /**
-     * @brief Wraps SDL_Surface image data into interface object
+     * @brief Place SDL_Surface image data into an interface object
      *
      * @param  Pointer to a valid SDL_Surface object, not const due to ways
      * the SDL handles conversion of colored images to grayscale
@@ -60,7 +60,7 @@ class FrameSlider;
 class FramedBitmap : public GrayscaleBitmap {
 public:
     /**
-     * @brief Wraps SDL_Surface image data into interface object
+     * @brief Place SDL_Surface image data into an interface object
      * @see GrayscaleBitmap(SDL_Surface*)
      */
     explicit FramedBitmap(SDL_Surface*);
@@ -76,14 +76,14 @@ public:
     const FrameSlider lastFrame()   const;
 
     /**
-     * @brief Set frame size in pixels
+     * @brief Set frame size
      *
      * @param width frame width in pixels
      * @param height frame height in pixels
      */
     void setFrameSize(size_t width, size_t height);
     /**
-     * @brief Get how much frames with current size there are
+     * @brief Get how much frames with the current size there are
      * in the bitmap
      */
     size_t countFrames() const;
@@ -94,6 +94,7 @@ public:
 
 /**
  * @brief Iterator-like class for FramedBitmap navigation
+ * @see FramedBitmap
  */
 class FrameSlider {
 public:
