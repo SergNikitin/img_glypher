@@ -15,13 +15,20 @@ typedef uint_fast8_t obj_brightness;
 typedef std::vector<obj_brightness> pixels_vector;
 typedef std::unique_ptr<pixels_vector> unique_pixels_ptr;
 
+/**
+ * Brightness level that corresponds to a white-colored pixel
+ */
 const obj_brightness MAX_GRAY_LEVELS = 255;
 
 /**
  * @brief Grayscale bitmap that stores pixel data
  * @details Interface object that is used in other modules, essentially
  * a wrapper over the different implemetations of the same thing provided by
- * font and image libraries
+ * font and image libraries; pixels are stored as grayscale, with the stored
+ * value as their gray level, or brightness (the closer the value is to 0,
+ * the closer the pixel's color to black)
+ *
+ * @see MAX_GRAY_LEVELS
  */
 class GrayscaleBitmap {
 public:
@@ -35,8 +42,8 @@ public:
     /**
      * @brief Place SDL_Surface image data into an interface object
      *
-     * @param  Pointer to a valid SDL_Surface object, not const due to ways
-     * the SDL handles conversion of colored images to grayscale
+     * @param  Pointer to a valid SDL_Surface object, not const due to the ways
+     * SDL handles conversion of colored images to grayscale
      */
     explicit GrayscaleBitmap(SDL_Surface*);
 
@@ -53,9 +60,9 @@ public:
 class FrameSlider;
 
 /**
- * @brief Grayscale bitmap with handy interfaces for image navigation
+ * @brief Grayscale bitmap with interfaces for easy pixel data navigation
  * @details Provides the ability to navigate bitmap frame-by-frame in the
- * iterator-like fashion, where frame is a bitmap part of given size
+ * iterator-like fashion, where frame is a bitmap part of a given size
  */
 class FramedBitmap : public GrayscaleBitmap {
 public:
