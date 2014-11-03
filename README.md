@@ -25,6 +25,7 @@ Image Glypher accepts the following command-line arguements:
 * `--font=<path_to_font>` - path to font file you want to use as a base for conversion
 (font must be monospaced)
 * `--fontsize=<size>` - defines how detailed the output will be, must be 1 or greater
+* `--oufile=<path_to_file>` - path to the output file; if not specified, image file path will be used
 * `--invert` - generate output as if painting with white on black
 
 Example:
