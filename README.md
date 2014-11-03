@@ -6,9 +6,8 @@ unfinished state, works best on images with both dark and bright areas.
 
 ## Examples
 
-![spacemarine_src]
-
-![spacemarine_ascii]
+[![spacemarine_src](http://i.imgur.com/n9xm3r6.jpg)](http://i.imgur.com/uVqEyLb.jpg)
+[![spacemarine_ascii](http://i.imgur.com/TEvP4V4.jpg)](http://i.imgur.com/uVqEyLb.jpg)
 
 ## How to build
 
@@ -42,5 +41,5 @@ Example:
 * [SDL2](https://www.libsdl.org/download-2.0.php) and [SDL_Image](https://www.libsdl.org/projects/SDL_image/) for retrieving image data
 
 
-[spacemarine_src]:http://i.imgur.com/uVqEyLb.jpg
-[spacemarine_ascii]:http://i.imgur.com/Z2M6zIO.png
+<!-- [spacemarine_src]:http://i.imgur.com/uVqEyLb.jpg -->
+<!-- [spacemarine_ascii]:http://i.imgur.com/Z2M6zIO.png -->
