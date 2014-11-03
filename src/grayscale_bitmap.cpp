@@ -89,14 +89,14 @@ FramedBitmap::FramedBitmap(const FramedBitmap& toCopy)
     , frameHeight(toCopy.frameHeight) {}
 
 FrameSlider FramedBitmap::firstFrame() const {
-    return FrameSlider(*this, frameWidth, frameHeight);
+    return FrameSlider(*this);
 }
 
 const FrameSlider FramedBitmap::lastFrame() const {
     size_t leftBorderCol    = columns   - columns % frameWidth  - frameWidth;
     size_t topBorderRow     = rows      - rows % frameHeight    - frameHeight;
 
-    return FrameSlider(*this, frameWidth, frameHeight, leftBorderCol, topBorderRow);
+    return FrameSlider(*this, leftBorderCol, topBorderRow);
 }
 
 void FramedBitmap::setFrameSize(size_t width, size_t height) {
@@ -109,16 +109,13 @@ size_t FramedBitmap::countFrames() const {
 }
 
 FrameSlider::FrameSlider(const FramedBitmap& _map,
-                        const size_t _width, const size_t _height,
                         size_t _leftBorderCol, size_t _topBorderRow)
     : map(&_map)
-    , width(_width)
-    , height(_height)
     , leftBorderCol(_leftBorderCol)
     , topBorderRow(_topBorderRow) {
 
-    if (    leftBorderCol + width > map->columns
-        ||  topBorderRow + height > map->rows) {
+    if (    leftBorderCol + map->frameWidth  > map->columns
+        ||  topBorderRow  + map->frameHeight > map->rows) {
         throw std::out_of_range("Specified frame is out of given bitmap borders");
     }
 }
@@ -126,13 +123,13 @@ FrameSlider::FrameSlider(const FramedBitmap& _map,
 void FrameSlider::slide() {
     size_t newLeftBorder, newTopBorder;
 
-    size_t colPosOfFrameToRight  = leftBorderCol + width;
-    size_t rowPosOfFrameBelow    = topBorderRow  + height;
+    size_t colPosOfFrameToRight  = leftBorderCol + map->frameWidth;
+    size_t rowPosOfFrameBelow    = topBorderRow  + map->frameHeight;
 
-    if (colPosOfFrameToRight + width <= map->columns) {
+    if (colPosOfFrameToRight + map->frameWidth <= map->columns) {
         newLeftBorder = colPosOfFrameToRight;
         newTopBorder = topBorderRow;
-    } else if (rowPosOfFrameBelow + height <= map->rows) {
+    } else if (rowPosOfFrameBelow + map->frameHeight <= map->rows) {
         newLeftBorder = 0;
         newTopBorder = rowPosOfFrameBelow;
     } else {
@@ -144,24 +141,24 @@ void FrameSlider::slide() {
 }
 
 obj_brightness FrameSlider::at(size_t pos) const {
-    if (pos >= width * height) {
+    if (pos >= map->frameWidth * map->frameHeight) {
         throw std::out_of_range("Out of frame borders");
     }
 
-    size_t mapRow    = topBorderRow  + pos / width;
-    size_t mapColumn = leftBorderCol + pos % width;
+    size_t mapRow    = topBorderRow  + pos / map->frameWidth;
+    size_t mapColumn = leftBorderCol + pos % map->frameWidth;
 
     return map->pixels->at(mapRow * map->columns + mapColumn);
 }
 
 size_t FrameSlider::size() const {
-    return width * height;
+    return map->frameWidth * map->frameHeight;
 }
 
 bool FrameSlider::operator==(const FrameSlider& toCompare) const {
     return     map == toCompare.map
-            && width == toCompare.width
-            && height == toCompare.height
+            && map->frameWidth == toCompare.map->frameWidth
+            && map->frameHeight == toCompare.map->frameHeight
             && leftBorderCol == toCompare.leftBorderCol
             && topBorderRow == toCompare.topBorderRow;
 }
